@@ -182,8 +182,17 @@
     function status() {
       const online = navigator.onLine;
       $('connectivity').classList.toggle('off', !online);
-      $('connection-label').textContent = online ? 'جاهز للأوفلاين' : 'شغّال أوفلاين';
+      $('connection-label').textContent = online ? 'تحديث التطبيق' : 'شغّال أوفلاين';
+      $('connectivity').setAttribute('aria-label', online ? 'تحميل أحدث نسخة من الحاسبة' : 'التطبيق يعمل بدون إنترنت');
     }
+    $('connectivity').addEventListener('click', () => {
+      if (!navigator.onLine) {
+        toast('الحاسبة شغّالة أوفلاين — اتصال الإنترنت مطلوب للتحديث');
+        return;
+      }
+      $('connection-label').textContent = 'عم نحدّث…';
+      window.location.assign(new URL('./index.html?fresh=' + Date.now(), window.location.href).href);
+    });
     window.addEventListener('online', status);
     window.addEventListener('offline', status);
     status();
@@ -194,8 +203,19 @@
         reloading = true;
         location.reload();
       });
+      async function checkForUpdates() {
+        if (!navigator.onLine) return;
+        try {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg) await reg.update();
+        } catch (_) {}
+      }
       navigator.serviceWorker.register('./sw.js', {updateViaCache:'none'})
         .then(reg => reg.update().catch(() => {})).catch(() => {});
+      window.addEventListener('pageshow', checkForUpdates);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkForUpdates();
+      });
     }
   }
   init();
