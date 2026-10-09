@@ -111,3 +111,10 @@ footer{margin:25px 15px 3px;text-align:center;color:#6f8395;font-size:11px;line-
 @media(max-width:400px){.wrap{padding-inline:13px}.header h1{font-size:18px}.header{gap:5px}.status{font-size:10px;padding:9px 8px}.brandmark{height:46px;width:46px}.hero{padding:22px 18px}.panel{padding:14px}.input-grid{gap:9px}.input-grid input{font-size:21px}.unit{min-width:45px}.metric{padding:13px 9px}.currency-line{gap:7px}}
 @media(max-width:345px){.status{font-size:0;padding:11px}.status i{flex-shrink:0}.currencies button{min-width:29px;padding:3px 5px}.input-grid{grid-template-columns:1fr}.results-grid{gap:6px}.metric{padding:11px 6px}.metric .number{font-size:15px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.route-car{transform:none!important}}
+
+/* Offline-friendly manual update control */
+.status{cursor:pointer;font:inherit;transition:transform .2s,background .2s;}
+.status:active{transform:scale(.96)}
+.status .refresh-icon{width:13px;height:13px;opacity:.75;flex-shrink:0}
+.status.off{color:var(--amber);border-color:rgba(255,201,137,.17)}
+@media(max-width:345px){.status .refresh-icon{display:none}}
