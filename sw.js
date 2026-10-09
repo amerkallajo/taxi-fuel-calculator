@@ -1,11 +1,11 @@
-/* Taxi Flow offline cache - v3: network-first navigation, versioned assets */
-const CACHE_NAME = 'taxi-fuel-offline-v3';
+/* Taxi Flow offline cache - v4: network-first navigation, versioned assets */
+const CACHE_NAME = 'taxi-fuel-offline-v4';
 const CACHE_PREFIX = 'taxi-fuel-offline-';
 const URLS = [
   './',
   './index.html',
-  './styles.css?v=3',
-  './app.js?v=3',
+  './styles.css?v=4',
+  './app.js?v=4',
   './manifest.webmanifest',
   './icons/taxi.svg',
   './icons/apple-touch-icon.png'
