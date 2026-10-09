@@ -2,115 +2,144 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#101d2d">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b12">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="حاسبة التكسي">
-  <meta name="description" content="حاسبة مصروف البنزين للتكسي تعمل دون اتصال بالإنترنت.">
+  <meta name="description" content="حاسبة مصروف التكسي: بنزين الرحلات والعودة وتكلفة الكيلومتر. تعمل بدون إنترنت.">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <title>حاسبة مصروف التكسي</title>
-  <style>
-    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; --ink:#17263d;--soft:#637289;--line:#e5eaf1;--back:#f3f6fa;--teal:#087c71;--dark:#101d2d; }
-    * {box-sizing:border-box}
-    body{background:var(--back);color:var(--ink);margin:0;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-    main{max-width:540px;margin:0 auto;padding:24px 16px 28px}
-    .head{display:flex;align-items:center;gap:12px;margin:0 0 22px}
-    .logo{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:var(--dark);font-size:28px}
-    h1{font-size:22px;line-height:1.35;margin:0;letter-spacing:-.3px}
-    .sub{font-size:13px;color:var(--soft);margin-top:4px}
-    .panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 26px rgba(20,34,56,.04)}
-    .field{margin-bottom:18px}.field label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
-    .hint{font-size:12px;color:var(--soft);margin-top:6px}
-    input,select{appearance:none;-webkit-appearance:none;background:#fff;border:1px solid #ced8e4;width:100%;border-radius:12px;padding:15px 13px;font-size:18px;font-weight:650;color:var(--ink);outline:0;direction:ltr;text-align:left;min-height:54px}
-    input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,124,113,.12)}
-    select{background-image:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="14" height="10"%3E%3Cpath fill="none" stroke="%23637289" stroke-width="2" d="m1 2 6 6 6-6"/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:14px center;padding-left:35px;font-size:15px}
-    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .switchline{display:flex;align-items:center;gap:11px;padding:10px 0 0;font-size:14px;cursor:pointer;user-select:none}
-    .switchline input{appearance:auto;-webkit-appearance:checkbox;width:21px;height:21px;min-height:unset;margin:0;accent-color:var(--teal);box-shadow:none}
-    .results{margin-top:19px}
-    .hero{border-radius:18px;background:var(--dark);color:#fff;padding:22px 19px}
-    .hero small{color:#c5d6e0;font-size:14px}.hero strong{display:block;font-size:33px;font-weight:800;margin-top:9px;overflow-wrap:anywhere;line-height:1.4;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
-    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 13px;min-width:0}
-    .metric small{display:block;color:var(--soft);font-size:12px;margin-bottom:10px}
-    .metric strong{font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;direction:ltr;display:block;text-align:right}
-    .rowmetric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:11px;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13px;color:var(--soft)}
-    .rowmetric strong{font-size:16px;color:var(--ink);direction:ltr;text-align:left}
-    .action{display:flex;gap:10px;margin-top:16px}
-    button{font:inherit;cursor:pointer;border:0;padding:13px 17px;border-radius:12px;font-size:14px;font-weight:700}
-    .reset{background:#e8eef5;color:#33445b}
-    .copy{background:#e0f1ec;color:#07675e;flex:1}
-    .foot{font-size:12px;color:var(--soft);text-align:center;line-height:1.75;margin:22px 5px}
-    .error{color:#ac3535;font-size:12px;min-height:17px;display:block;margin-top:5px}
-    @media(max-width:340px){.two{grid-template-columns:1fr}.hero strong{font-size:28px}}
-  </style>
+  <link rel="icon" type="image/svg+xml" href="./icons/taxi.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <title>حاسبة التكسي — Taxi Flow</title>
 </head>
 <body>
-<main>
-  <header class="head"><div class="logo" aria-hidden="true">🚕</div><div><h1>حاسبة مصروف التكسي</h1><div class="sub">بنزين الرحلة • تعمل دون إنترنت</div></div></header>
-  <section class="panel" aria-label="بيانات المشوار">
-    <div class="field"><label for="distance">مسافة المشوار (كيلومتر)</label><input id="distance" type="text" inputmode="decimal" autocomplete="off" value="20" aria-describedby="distance-error"><span id="distance-error" class="error" aria-live="polite"></span></div>
-    <div class="field"><label for="efficiency">قديش سيارتك بتمشي باللتر؟ (Km/L)</label><input id="efficiency" type="text" inputmode="decimal" autocomplete="off" value="12" aria-describedby="efficiency-error"><div class="hint">مثال: إذا بتمشي 12 كم بكل لتر، اكتب 12</div><span id="efficiency-error" class="error" aria-live="polite"></span></div>
-    <div class="two">
-      <div class="field"><label for="price">سعر لتر البنزين</label><input id="price" type="text" inputmode="decimal" autocomplete="off" placeholder="مثلاً 12000" aria-describedby="price-error"><span id="price-error" class="error" aria-live="polite"></span></div>
-      <div class="field"><label for="currency">العملة</label><select id="currency"><option value="ل.س">ليرة سورية</option><option value="$">دولار أمريكي</option><option value="€">يورو</option><option value="₺">ليرة تركية</option></select></div>
+  <main class="wrap">
+    <header class="header">
+      <div class="identity">
+        <div class="brandmark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 20.5 9 13c.5-1.3 1.3-2 2.7-2h8.6c1.4 0 2.2.7 2.7 2l3 7.5"/>
+            <path d="M7 20h18c1.1 0 2 1 2 2v3H5v-3c0-1.1.9-2 2-2Z"/>
+            <path d="M10 24v2a2 2 0 0 1-4 0v-1m20-1v2a2 2 0 0 1-4 0v-1M11 15h10M13 7h6m-3-2v4"/>
+            <circle cx="9" cy="22.8" r=".6" fill="currentColor"/><circle cx="23" cy="22.8" r=".6" fill="currentColor"/>
+          </svg>
+        </div>
+        <div><div class="kicker">TAXI FLOW</div><h1>حاسبة مصروف التكسي</h1></div>
+      </div>
+      <div class="status" id="connectivity"><i aria-hidden="true"></i><span id="connection-label">جاهز للأوفلاين</span></div>
+    </header>
+
+    <section class="hero intro" aria-label="تكلفة المشوار">
+      <div class="hero-eyebrow">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20m5-15.5a4.5 4.5 0 0 0-4.5-2H10a3.5 3.5 0 0 0 0 7h4a3.5 3.5 0 0 1 0 7H11a4.5 4.5 0 0 1-4.5-2"/></svg>
+        تكلفة بنزين المشوار
+      </div>
+      <div class="value-row" aria-live="polite" aria-atomic="true">
+        <span id="cost-number" class="hero-value">—</span>
+        <span id="cost-unit" class="hero-unit"></span>
+      </div>
+      <div class="hero-hint" id="cost-hint">أدخل سعر اللتر لتشوف تكلفة المشوار</div>
+      <div class="route" aria-hidden="true">
+        <div class="route-start">الانطلاق</div>
+        <div class="route-track">
+          <div class="route-car">
+            <svg viewBox="0 0 24 24" stroke="#09251b" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 7 8h10l2 5m-14 0h14a2 2 0 0 1 2 2v3H3v-3a2 2 0 0 1 2-2Zm1 5v2m12-2v2"/></svg>
+          </div>
+        </div>
+        <div class="route-end">الوصول</div>
+      </div>
+    </section>
+
+    <div class="section-head"><h2>تفاصيل الرحلة</h2><span class="minor">الحساب مباشر ✦</span></div>
+    <section class="panel intro" aria-label="مدخلات الحاسبة">
+      <div class="field distance-row">
+        <label for="distance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a4 4 0 0 0 0-8h-6a4 4 0 0 1 0-8h7"/></svg>
+          مسافة المشوار
+        </label>
+        <div class="inputbox"><input id="distance" type="text" inputmode="decimal" autocomplete="off" value="20" aria-describedby="error-distance" aria-label="مسافة المشوار بالكيلومتر"><span class="unit">كم</span></div>
+        <div id="error-distance" class="field-error" role="status"></div>
+        <div class="quick" aria-label="مسافات سريعة">
+          <button type="button" data-distance="5" aria-pressed="false">5 كم</button>
+          <button type="button" data-distance="10" aria-pressed="false">10 كم</button>
+          <button type="button" data-distance="20" aria-pressed="true" class="selected">20 كم</button>
+          <button type="button" data-distance="50" aria-pressed="false">50 كم</button>
+        </div>
+      </div>
+      <div class="input-grid">
+        <div class="field">
+          <label for="efficiency">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v15M3 10h12M6 7h6M15 8h2l3 3v7a2 2 0 1 0 4 0v-5l-4-4M2 21h15"/></svg>
+            كفاءة السيارة
+          </label>
+          <div class="inputbox"><input id="efficiency" type="text" inputmode="decimal" autocomplete="off" value="12" aria-describedby="error-efficiency" aria-label="الكيلومترات لكل لتر"><span class="unit">كم/لتر</span></div>
+          <div id="error-efficiency" class="field-error" role="status"></div>
+        </div>
+        <div class="field">
+          <label for="price">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 6.5A5 5 0 0 0 12 4H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7h-3a5 5 0 0 1-4.5-2.5"/></svg>
+            سعر اللتر
+          </label>
+          <div class="inputbox"><input id="price" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-describedby="error-price" aria-label="سعر لتر البنزين"><span class="unit">/ لتر</span></div>
+          <div id="error-price" class="field-error" role="status"></div>
+        </div>
+      </div>
+      <div class="currency-line">
+        <span class="name">العملة</span>
+        <div class="currencies" role="group" aria-label="اختيار العملة">
+          <button type="button" data-currency="ل.س" aria-pressed="true">ل.س</button>
+          <button type="button" data-currency="$" aria-pressed="false">$</button>
+          <button type="button" data-currency="€" aria-pressed="false">€</button>
+          <button type="button" data-currency="₺" aria-pressed="false">₺</button>
+        </div>
+      </div>
+    </section>
+
+    <label class="toggle-area intro" for="roundtrip">
+      <div class="toggle-copy">
+        <div class="toggle-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h14l-3-3m3 3-3 3M20 17H6l3 3m-3-3 3-3"/></svg>
+        </div>
+        <div><strong>احسب الذهاب والرجعة</strong><small>تضاعف المسافة تلقائياً</small></div>
+      </div>
+      <span class="switch"><input id="roundtrip" type="checkbox" role="switch" aria-label="حساب الذهاب والعودة"><span class="switch-track"></span></span>
+    </label>
+
+    <div class="section-head"><h2>ملخّص المشوار</h2><span class="minor">كل الأرقام لحظية</span></div>
+    <section class="results-grid intro" aria-label="ملخص استهلاك البنزين">
+      <div class="metric">
+        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v14M4 10h11M17 9h2l2 3v6a2 2 0 0 1-4 0v-5M3 20h14"/></svg></div>
+        <span class="title">البنزين المستهلك</span><strong class="number" id="consumption">—</strong>
+      </div>
+      <div class="metric">
+        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h3l4-11 4 11 3-7 4 7M3 21h18"/></svg></div>
+        <span class="title">المسافة الكلية</span><strong class="number" id="distance-total">—</strong>
+      </div>
+      <div class="metric">
+        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10m3-7a3 3 0 0 0-3-2h-1a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-1a3 3 0 0 1-3-2"/></svg></div>
+        <span class="title">تكلفة الكيلومتر</span><strong class="number" id="per-km">—</strong>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="action primary" id="copy" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+        نسخ نتيجة المشوار
+      </button>
+      <button type="button" class="action secondary" id="reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>
+        تصفير
+      </button>
     </div>
-    <label class="switchline"><input id="roundtrip" type="checkbox"><span>احسب مصروف الرجعة كمان (ضعف المسافة)</span></label>
-  </section>
-  <section class="results" aria-label="النتائج">
-    <div class="hero"><small>إجمالي تكلفة البنزين للمشوار</small><strong id="cost" aria-live="polite">—</strong></div>
-    <div class="metrics"><div class="metric"><small>⛽ البنزين المستهلك</small><strong id="liters">—</strong></div><div class="metric"><small>🛣️ المسافة الإجمالية</small><strong id="total-distance">20 كم</strong></div></div>
-    <div class="rowmetric"><span>تكلفة البنزين لكل 1 كم</span><strong id="cost-per-km">—</strong></div>
-    <div class="action"><button class="copy" type="button" id="copy">نسخ نتيجة المشوار</button><button class="reset" type="button" id="reset">إعادة ضبط</button></div>
-  </section>
-  <p class="foot">الحاسبة بتحسب تكلفة البنزين فقط، مو الصيانة والزيت واستهلاك السيارة.<br>إعدادات السيارة وسعر البنزين بتنحفظ على هالجهاز فقط.</p>
-</main>
-<script>
-(function(){
-  'use strict';
-  const $=id=>document.getElementById(id);
-  const ids=['distance','efficiency','price','currency','roundtrip'];
-  const savedKey='taxi-fuel-offline-v1';
-  function readSaved(){try{return JSON.parse(localStorage.getItem(savedKey)||'{}')}catch(_){return {}}}
-  function store(){try{localStorage.setItem(savedKey,JSON.stringify({efficiency:$('efficiency').value,price:$('price').value,currency:$('currency').value}))}catch(_){}}
-  function parseNumber(value){
-    const arabic='٠١٢٣٤٥٦٧٨٩',persian='۰۱۲۳۴۵۶۷۸۹';
-    let text=String(value).trim().replace(/[٠-٩]/g,ch=>String(arabic.indexOf(ch))).replace(/[۰-۹]/g,ch=>String(persian.indexOf(ch))).replace(/\s/g,'').replace(/٬/g,'').replace(/٫/g,'.');
-    if(/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(text))text=text.replace(/,/g,'');
-    else text=text.replace(',','.');
-    if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(text))return NaN;
-    return Number(text);
-  }
-  function fmt(number,max=2){return new Intl.NumberFormat('en-US',{maximumFractionDigits:max}).format(number)}
-  function valid(id,positive){const raw=$(id).value.trim();const val=parseNumber(raw);let msg='';if(raw==='')msg='يرجى إدخال القيمة';else if(!Number.isFinite(val)||val<0||(positive&&val===0))msg='أدخل رقماً '+(positive?'أكبر من الصفر':'صحيحاً');$(id+'-error').textContent=msg;$(id).setAttribute('aria-invalid',msg?'true':'false');return msg?null:val}
-  function calculate(){
-    const distance=valid('distance',true),eff=valid('efficiency',true),price= $('price').value.trim()===''?null:valid('price',false);
-    $('price-error').textContent=$('price').value.trim()===''?'أدخل سعر البنزين للحساب':'';
-    if(price===null)$('price').setAttribute('aria-invalid','true');
-    const unit=$('currency').value, km=distance===null?null:distance*($('roundtrip').checked?2:1);
-    const liters=km!==null&&eff!==null?km/eff:null;
-    const cost=liters!==null&&price!==null?liters*price:null;
-    $('total-distance').textContent=km!==null?fmt(km)+' كم':'—';
-    $('liters').textContent=liters!==null?fmt(liters,3)+' لتر':'—';
-    $('cost').textContent=cost!==null?fmt(cost)+' '+unit:'—';
-    $('cost-per-km').textContent=price!==null&&eff!==null?fmt(price/eff)+' '+unit:'—';
-    $('copy').disabled=cost===null;
-    return {km,liters,cost,unit};
-  }
-  let current=null;
-  function refresh(){store();current=calculate()}
-  const saved=readSaved();
-  if(typeof saved.efficiency==='string')$('efficiency').value=saved.efficiency;
-  if(typeof saved.price==='string')$('price').value=saved.price;
-  if(['ل.س','$','€','₺'].includes(saved.currency))$('currency').value=saved.currency;
-  ids.forEach(id=>$(id).addEventListener(id==='roundtrip'||id==='currency'?'change':'input',refresh));
-  $('reset').addEventListener('click',()=>{ $('distance').value='20';$('efficiency').value='12';$('price').value='';$('currency').value='ل.س';$('roundtrip').checked=false;refresh() });
-  $('copy').addEventListener('click',async()=>{if(!current||current.cost===null)return;const message='مسافة المشوار: '+fmt(current.km)+' كم\nالبنزين: '+fmt(current.liters,3)+' لتر\nتكلفة البنزين: '+fmt(current.cost)+' '+current.unit;try{await navigator.clipboard.writeText(message);$('copy').textContent='✓ تم النسخ';setTimeout(()=>$('copy').textContent='نسخ نتيجة المشوار',1600)}catch(_){$('copy').textContent='النسخ غير متاح';setTimeout(()=>$('copy').textContent='نسخ نتيجة المشوار',1600)}});
-  refresh();
-  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
-})();
-</script>
+    <footer>
+      النتيجة تشمل البنزين فقط، بدون الزيت والصيانة واستهلاك السيارة.<br>
+      إعدادات سيارتك محفوظة محلياً على الآيفون.
+      <div class="version">TAXI FLOW · DARK EDITION 2.0</div>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script defer src="./app.js"></script>
 </body>
 </html>
