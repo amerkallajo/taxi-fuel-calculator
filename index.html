@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101d2d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="حاسبة التكسي">
+  <meta name="description" content="حاسبة مصروف البنزين للتكسي تعمل دون اتصال بالإنترنت.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <title>حاسبة مصروف التكسي</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; --ink:#17263d;--soft:#637289;--line:#e5eaf1;--back:#f3f6fa;--teal:#087c71;--dark:#101d2d; }
+    * {box-sizing:border-box}
+    body{background:var(--back);color:var(--ink);margin:0;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    main{max-width:540px;margin:0 auto;padding:24px 16px 28px}
+    .head{display:flex;align-items:center;gap:12px;margin:0 0 22px}
+    .logo{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:var(--dark);font-size:28px}
+    h1{font-size:22px;line-height:1.35;margin:0;letter-spacing:-.3px}
+    .sub{font-size:13px;color:var(--soft);margin-top:4px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 26px rgba(20,34,56,.04)}
+    .field{margin-bottom:18px}.field label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+    .hint{font-size:12px;color:var(--soft);margin-top:6px}
+    input,select{appearance:none;-webkit-appearance:none;background:#fff;border:1px solid #ced8e4;width:100%;border-radius:12px;padding:15px 13px;font-size:18px;font-weight:650;color:var(--ink);outline:0;direction:ltr;text-align:left;min-height:54px}
+    input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,124,113,.12)}
+    select{background-image:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="14" height="10"%3E%3Cpath fill="none" stroke="%23637289" stroke-width="2" d="m1 2 6 6 6-6"/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:14px center;padding-left:35px;font-size:15px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .switchline{display:flex;align-items:center;gap:11px;padding:10px 0 0;font-size:14px;cursor:pointer;user-select:none}
+    .switchline input{appearance:auto;-webkit-appearance:checkbox;width:21px;height:21px;min-height:unset;margin:0;accent-color:var(--teal);box-shadow:none}
+    .results{margin-top:19px}
+    .hero{border-radius:18px;background:var(--dark);color:#fff;padding:22px 19px}
+    .hero small{color:#c5d6e0;font-size:14px}.hero strong{display:block;font-size:33px;font-weight:800;margin-top:9px;overflow-wrap:anywhere;line-height:1.4;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 13px;min-width:0}
+    .metric small{display:block;color:var(--soft);font-size:12px;margin-bottom:10px}
+    .metric strong{font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;direction:ltr;display:block;text-align:right}
+    .rowmetric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;margin-top:11px;display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13px;color:var(--soft)}
+    .rowmetric strong{font-size:16px;color:var(--ink);direction:ltr;text-align:left}
+    .action{display:flex;gap:10px;margin-top:16px}
+    button{font:inherit;cursor:pointer;border:0;padding:13px 17px;border-radius:12px;font-size:14px;font-weight:700}
+    .reset{background:#e8eef5;color:#33445b}
+    .copy{background:#e0f1ec;color:#07675e;flex:1}
+    .foot{font-size:12px;color:var(--soft);text-align:center;line-height:1.75;margin:22px 5px}
+    .error{color:#ac3535;font-size:12px;min-height:17px;display:block;margin-top:5px}
+    @media(max-width:340px){.two{grid-template-columns:1fr}.hero strong{font-size:28px}}
+  </style>
+</head>
+<body>
+<main>
+  <header class="head"><div class="logo" aria-hidden="true">🚕</div><div><h1>حاسبة مصروف التكسي</h1><div class="sub">بنزين الرحلة • تعمل دون إنترنت</div></div></header>
+  <section class="panel" aria-label="بيانات المشوار">
+    <div class="field"><label for="distance">مسافة المشوار (كيلومتر)</label><input id="distance" type="text" inputmode="decimal" autocomplete="off" value="20" aria-describedby="distance-error"><span id="distance-error" class="error" aria-live="polite"></span></div>
+    <div class="field"><label for="efficiency">قديش سيارتك بتمشي باللتر؟ (Km/L)</label><input id="efficiency" type="text" inputmode="decimal" autocomplete="off" value="12" aria-describedby="efficiency-error"><div class="hint">مثال: إذا بتمشي 12 كم بكل لتر، اكتب 12</div><span id="efficiency-error" class="error" aria-live="polite"></span></div>
+    <div class="two">
+      <div class="field"><label for="price">سعر لتر البنزين</label><input id="price" type="text" inputmode="decimal" autocomplete="off" placeholder="مثلاً 12000" aria-describedby="price-error"><span id="price-error" class="error" aria-live="polite"></span></div>
+      <div class="field"><label for="currency">العملة</label><select id="currency"><option value="ل.س">ليرة سورية</option><option value="$">دولار أمريكي</option><option value="€">يورو</option><option value="₺">ليرة تركية</option></select></div>
+    </div>
+    <label class="switchline"><input id="roundtrip" type="checkbox"><span>احسب مصروف الرجعة كمان (ضعف المسافة)</span></label>
+  </section>
+  <section class="results" aria-label="النتائج">
+    <div class="hero"><small>إجمالي تكلفة البنزين للمشوار</small><strong id="cost" aria-live="polite">—</strong></div>
+    <div class="metrics"><div class="metric"><small>⛽ البنزين المستهلك</small><strong id="liters">—</strong></div><div class="metric"><small>🛣️ المسافة الإجمالية</small><strong id="total-distance">20 كم</strong></div></div>
+    <div class="rowmetric"><span>تكلفة البنزين لكل 1 كم</span><strong id="cost-per-km">—</strong></div>
+    <div class="action"><button class="copy" type="button" id="copy">نسخ نتيجة المشوار</button><button class="reset" type="button" id="reset">إعادة ضبط</button></div>
+  </section>
+  <p class="foot">الحاسبة بتحسب تكلفة البنزين فقط، مو الصيانة والزيت واستهلاك السيارة.<br>إعدادات السيارة وسعر البنزين بتنحفظ على هالجهاز فقط.</p>
+</main>
+<script>
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const ids=['distance','efficiency','price','currency','roundtrip'];
+  const savedKey='taxi-fuel-offline-v1';
+  function readSaved(){try{return JSON.parse(localStorage.getItem(savedKey)||'{}')}catch(_){return {}}}
+  function store(){try{localStorage.setItem(savedKey,JSON.stringify({efficiency:$('efficiency').value,price:$('price').value,currency:$('currency').value}))}catch(_){}}
+  function parseNumber(value){
+    const arabic='٠١٢٣٤٥٦٧٨٩',persian='۰۱۲۳۴۵۶۷۸۹';
+    let text=String(value).trim().replace(/[٠-٩]/g,ch=>String(arabic.indexOf(ch))).replace(/[۰-۹]/g,ch=>String(persian.indexOf(ch))).replace(/\s/g,'').replace(/٬/g,'').replace(/٫/g,'.');
+    if(/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(text))text=text.replace(/,/g,'');
+    else text=text.replace(',','.');
+    if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(text))return NaN;
+    return Number(text);
+  }
+  function fmt(number,max=2){return new Intl.NumberFormat('en-US',{maximumFractionDigits:max}).format(number)}
+  function valid(id,positive){const raw=$(id).value.trim();const val=parseNumber(raw);let msg='';if(raw==='')msg='يرجى إدخال القيمة';else if(!Number.isFinite(val)||val<0||(positive&&val===0))msg='أدخل رقماً '+(positive?'أكبر من الصفر':'صحيحاً');$(id+'-error').textContent=msg;$(id).setAttribute('aria-invalid',msg?'true':'false');return msg?null:val}
+  function calculate(){
+    const distance=valid('distance',true),eff=valid('efficiency',true),price= $('price').value.trim()===''?null:valid('price',false);
+    $('price-error').textContent=$('price').value.trim()===''?'أدخل سعر البنزين للحساب':'';
+    if(price===null)$('price').setAttribute('aria-invalid','true');
+    const unit=$('currency').value, km=distance===null?null:distance*($('roundtrip').checked?2:1);
+    const liters=km!==null&&eff!==null?km/eff:null;
+    const cost=liters!==null&&price!==null?liters*price:null;
+    $('total-distance').textContent=km!==null?fmt(km)+' كم':'—';
+    $('liters').textContent=liters!==null?fmt(liters,3)+' لتر':'—';
+    $('cost').textContent=cost!==null?fmt(cost)+' '+unit:'—';
+    $('cost-per-km').textContent=price!==null&&eff!==null?fmt(price/eff)+' '+unit:'—';
+    $('copy').disabled=cost===null;
+    return {km,liters,cost,unit};
+  }
+  let current=null;
+  function refresh(){store();current=calculate()}
+  const saved=readSaved();
+  if(typeof saved.efficiency==='string')$('efficiency').value=saved.efficiency;
+  if(typeof saved.price==='string')$('price').value=saved.price;
+  if(['ل.س','$','€','₺'].includes(saved.currency))$('currency').value=saved.currency;
+  ids.forEach(id=>$(id).addEventListener(id==='roundtrip'||id==='currency'?'change':'input',refresh));
+  $('reset').addEventListener('click',()=>{ $('distance').value='20';$('efficiency').value='12';$('price').value='';$('currency').value='ل.س';$('roundtrip').checked=false;refresh() });
+  $('copy').addEventListener('click',async()=>{if(!current||current.cost===null)return;const message='مسافة المشوار: '+fmt(current.km)+' كم\nالبنزين: '+fmt(current.liters,3)+' لتر\nتكلفة البنزين: '+fmt(current.cost)+' '+current.unit;try{await navigator.clipboard.writeText(message);$('copy').textContent='✓ تم النسخ';setTimeout(()=>$('copy').textContent='نسخ نتيجة المشوار',1600)}catch(_){$('copy').textContent='النسخ غير متاح';setTimeout(()=>$('copy').textContent='نسخ نتيجة المشوار',1600)}});
+  refresh();
+  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
