@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" href="./icons/taxi.svg">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=3">
   <title>حاسبة التكسي — Taxi Flow</title>
 </head>
 <body>
@@ -28,7 +28,7 @@
         </div>
         <div><div class="kicker">TAXI FLOW</div><h1>حاسبة مصروف التكسي</h1></div>
       </div>
-      <div class="status" id="connectivity"><i aria-hidden="true"></i><span id="connection-label">جاهز للأوفلاين</span></div>
+      <button class="status" id="connectivity" type="button" title="التحقق من النسخة الأحدث" aria-label="التحقق من تحديث التطبيق"><i aria-hidden="true"></i><span id="connection-label">تحديث التطبيق</span><svg class="refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-3 7M20 4v7h-7"/></svg></button>
     </header>
 
     <section class="hero intro" aria-label="تكلفة المشوار">
@@ -136,10 +136,10 @@
     <footer>
       النتيجة تشمل البنزين فقط، بدون الزيت والصيانة واستهلاك السيارة.<br>
       إعدادات سيارتك محفوظة محلياً على الآيفون.
-      <div class="version">TAXI FLOW · DARK EDITION 2.0</div>
+      <div class="version">TAXI FLOW · DARK EDITION 2.1</div>
     </footer>
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script defer src="./app.js"></script>
+  <script defer src="./app.js?v=3"></script>
 </body>
 </html>
