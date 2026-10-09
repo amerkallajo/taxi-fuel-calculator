@@ -1,15 +1,26 @@
 {
   "id": "./",
-  "name": "حاسبة مصروف التكسي",
+  "name": "حاسبة مصروف التكسي | Taxi Flow",
   "short_name": "حاسبة التكسي",
+  "description": "حاسبة تكاليف البنزين للتاكسي، تعمل بالكامل بدون إنترنت",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f3f6fa",
-  "theme_color": "#101d2d",
+  "background_color": "#070b12",
+  "theme_color": "#070b12",
   "icons": [
-    {"src": "./icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+    {
+      "src": "./icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/taxi.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }
