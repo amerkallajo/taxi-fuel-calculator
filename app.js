@@ -133,7 +133,7 @@
   async function copyResults() {
     if (!current) return;
     const s = current;
-    const result = '🚕 مصروف المشوار\n' +
+    const result = '🛣️ تكاليف الطريق — مصروف المشوار\n' +
       'المسافة: ' + format(s.km) + ' كم\n' +
       'البنزين: ' + format(s.liters, 3) + ' لتر\n' +
       'تكلفة الكيلومتر: ' + format(s.perKm) + ' ' + s.currency + '\n' +

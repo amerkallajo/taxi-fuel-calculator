@@ -118,3 +118,9 @@ footer{margin:25px 15px 3px;text-align:center;color:#6f8395;font-size:11px;line-
 .status .refresh-icon{width:13px;height:13px;opacity:.75;flex-shrink:0}
 .status.off{color:var(--amber);border-color:rgba(255,201,137,.17)}
 @media(max-width:345px){.status .refresh-icon{display:none}}
+
+/* RoadCost app identity */
+.brandmark.app-icon{background:none;border:0;box-shadow:none}
+.brandmark.app-icon img{display:block;width:100%;height:100%;border-radius:16px}
+.header h1{font-size:18px;letter-spacing:-.35px}
+@media(max-width:400px){.header h1{font-size:16.5px}}

@@ -1,14 +1,15 @@
-/* Taxi Flow offline cache - v4: network-first navigation, versioned assets */
-const CACHE_NAME = 'taxi-fuel-offline-v4';
-const CACHE_PREFIX = 'taxi-fuel-offline-';
+/* RoadCost v5 — offline cache, versioned assets, iOS + Android */
+const CACHE_NAME = 'road-cost-offline-v5';
+const CACHE_PREFIX = 'road-cost-offline-';
+const OLD_CACHE_PREFIX = 'taxi-fuel-offline-';
 const URLS = [
   './',
   './index.html',
-  './styles.css?v=4',
-  './app.js?v=4',
+  './styles.css?v=5',
+  './app.js?v=5',
   './manifest.webmanifest',
-  './icons/taxi.svg',
-  './icons/apple-touch-icon.png'
+  './icons/road-cost.svg',
+  './icons/road-cost-180.png'
 ];
 
 self.addEventListener('install', event => {
@@ -23,7 +24,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(names => Promise.all(names
-        .filter(name => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
+        .filter(name => (name.startsWith(CACHE_PREFIX) || name.startsWith(OLD_CACHE_PREFIX)) && name !== CACHE_NAME)
         .map(name => caches.delete(name))))
       .then(() => self.clients.claim())
   );

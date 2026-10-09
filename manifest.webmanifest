@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "حاسبة مصروف التكسي | Taxi Flow",
-  "short_name": "حاسبة التكسي",
-  "description": "حاسبة تكاليف البنزين للتاكسي، تعمل بالكامل بدون إنترنت",
+  "name": "حاسبة تكاليف الطريق",
+  "short_name": "تكاليف الطريق",
+  "description": "حاسبة مجانية لتكلفة البنزين واستهلاك الوقود للمشاوير والرحلات، تعمل بدون إنترنت بعد أول تحميل",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
@@ -12,12 +12,12 @@
   "theme_color": "#070b12",
   "icons": [
     {
-      "src": "./icons/apple-touch-icon.png",
+      "src": "./icons/road-cost-180.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "./icons/taxi.svg",
+      "src": "./icons/road-cost.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"

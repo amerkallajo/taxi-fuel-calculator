@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="حاسبة تكاليف الطريق">
+ <defs>
+  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#1A3B46"/><stop offset=".47" stop-color="#0E2234"/><stop offset="1" stop-color="#07121E"/></linearGradient>
+  <linearGradient id="rim" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ABFFE0"/><stop offset=".56" stop-color="#4BDDAD"/><stop offset="1" stop-color="#178E9A"/></linearGradient>
+  <linearGradient id="sun" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#FFF0AD"/><stop offset=".45" stop-color="#FFC56B"/><stop offset="1" stop-color="#F77E40"/></linearGradient>
+  <linearGradient id="road" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#1A3850"/><stop offset="1" stop-color="#0C1C2D"/></linearGradient>
+  <clipPath id="clip"><rect x="8" y="8" width="496" height="496" rx="114"/></clipPath>
+ </defs>
+ <rect x="8" y="8" width="496" height="496" rx="114" fill="url(#bg)"/>
+ <g clip-path="url(#clip)">
+ <path d="M35 345C97 268 138 284 202 248c53-29 84-74 140-76s90 13 137 51v131H35Z" fill="#1C3945" opacity=".5"/>
+ <path d="M34 344c74-49 113-43 177-72 67-30 127-17 177-11 48 6 69 2 90-10v201H34Z" fill="#0C2335" opacity=".65"/>
+ <circle cx="422" cy="132" r="66" fill="#FDBC6A" opacity=".08"/>
+ <circle cx="422" cy="132" r="53" fill="#FDBC6A" opacity=".12"/>
+ <circle cx="422" cy="132" r="40" fill="url(#sun)"/>
+ <path d="M150 484C283 410 103 350 230 280c48-27 117-58 117-99" fill="none" stroke="#06121F" stroke-width="138" stroke-linecap="round"/>
+ <path d="M150 484C283 410 103 350 230 280c48-27 117-58 117-99" fill="none" stroke="url(#rim)" stroke-width="118" stroke-linecap="round"/>
+ <path d="M150 484C283 410 103 350 230 280c48-27 117-58 117-99" fill="none" stroke="url(#road)" stroke-width="99" stroke-linecap="round"/>
+ <path d="M150 484C283 410 103 350 230 280c48-27 117-58 117-99" fill="none" stroke="#FAE59C" stroke-opacity=".97" stroke-width="11" stroke-linecap="round" stroke-dasharray="25 34"/>
+ <path d="M94 476c34 0 55 0 69 0" stroke="#B5FFE0" stroke-opacity=".16" stroke-width="7" stroke-linecap="round"/>
+ </g>
+ <rect x="8" y="8" width="496" height="496" rx="114" stroke="#A5F9D4" stroke-opacity=".19" stroke-width="9" fill="none"/>
+</svg>
