@@ -1,5 +1,5 @@
-/* RoadCost v5 — offline cache, versioned assets, iOS + Android */
-const CACHE_NAME = 'road-cost-offline-v5';
+/* RoadCost v6 — offline cache, versioned assets, iOS + Android */
+const CACHE_NAME = 'road-cost-offline-v6';
 const CACHE_PREFIX = 'road-cost-offline-';
 const OLD_CACHE_PREFIX = 'taxi-fuel-offline-';
 const URLS = [
@@ -7,9 +7,11 @@ const URLS = [
   './index.html',
   './styles.css?v=5',
   './app.js?v=5',
-  './manifest.webmanifest',
-  './icons/road-cost.svg',
-  './icons/road-cost-180.png'
+  './manifest.webmanifest?v=6',
+  './icons/road-cost.svg?v=5',
+  './icons/road-cost-180.png?v=6',
+  './icons/road-cost-192.png?v=6',
+  './icons/road-cost-512.png?v=6'
 ];
 
 self.addEventListener('install', event => {
