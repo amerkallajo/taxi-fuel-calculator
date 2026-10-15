@@ -6,7 +6,7 @@ const URLS = [
   './',
   './index.html',
   './styles.css?v=7',
-  './map.js?v=7',
+  './map.js?v=8',
   './app.js?v=5',
   './manifest.webmanifest?v=6',
   './icons/road-cost.svg?v=5',
