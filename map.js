@@ -1,9 +1,10 @@
-/* Road Cost optional map v7. The calculator is independent of this script. */
+/* Road Cost map v9. Geocoding is independent from coordinate-based routing. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
   const CONFIG = {
     geocoder: 'https://photon.komoot.io/api/',
+    backupGeocoder: 'https://nominatim.openstreetmap.org/search',
     router: 'https://router.project-osrm.org/route/v1/driving/',
     tiles: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   };
@@ -130,71 +131,142 @@
       status('ابحث عن مكان أو اضغط على الخريطة لتحديد الانطلاق أو الوجهة.');
     } catch (e) {status('تعذّر تحميل الخريطة. تحقق من الإنترنت ثم أعد فتح القسم.', true);}
   }
-  async function getJSON(url, controller) {
-    const timer = setTimeout(() => controller.abort(), 15000);
+  // Each HTTP request has its own timeout: a Photon timeout must not prevent
+  // a fresh attempt via Nominatim. The parent signal cancels both on input edits.
+  async function getJSON(url, parent, timeoutMs = 12000) {
+    const controller = new AbortController();
+    const cancel = () => controller.abort();
+    parent.signal.addEventListener('abort', cancel, {once: true});
+    let expired = false;
+    const timer = setTimeout(() => {expired = true; controller.abort();}, timeoutMs);
     try {
-      const res = await fetch(url, {signal: controller.signal, headers: {Accept: 'application/json'}});
-      if (!res.ok) throw Error('HTTP ' + res.status);
-      return await res.json();
-    } finally {clearTimeout(timer);}
+      const response = await fetch(url, {
+        signal: controller.signal, headers: {Accept: 'application/json'}
+      });
+      if (!response.ok) {
+        const error = new Error('HTTP ' + response.status);
+        error.httpStatus = response.status;
+        throw error;
+      }
+      return await response.json();
+    } catch (error) {
+      if (expired) {
+        const timeoutError = new Error('Request timed out');
+        timeoutError.kind = 'timeout';
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
+      parent.signal.removeEventListener('abort', cancel);
+    }
   }
   function placeName(f) {
     const p = f.properties || {};
     return [...new Set([p.name, p.street, p.city, p.state, p.country].filter(Boolean))]
       .join('، ') || 'مكان بلا اسم';
   }
-  async function searchPlace(which, autoSelect = false) {
+  function describeFailure(error, provider) {
+    if (error.kind === 'timeout') return provider + ': انتهت مهلة الاتصال';
+    if (error.httpStatus === 429) return provider + ': تجاوز حد الطلبات (429)';
+    if (error.httpStatus === 403) return provider + ': الوصول مرفوض (403)';
+    if (error.httpStatus >= 500) return provider + ': خطأ بالخادم (' + error.httpStatus + ')';
+    if (error.httpStatus) return provider + ': خطأ HTTP ' + error.httpStatus;
+    if (error.name === 'AbortError') return provider + ': تم إلغاء الطلب';
+    return provider + ': تعذّر الاتصال (شبكة أو DNS أو CORS)';
+  }
+  async function queryProvider(provider, query, controller) {
+    const url = new URL(provider === 'Photon' ? CONFIG.geocoder : CONFIG.backupGeocoder);
+    url.searchParams.set('q', query); // URLSearchParams safely encodes Arabic as UTF-8.
+    url.searchParams.set('limit', '7');
+    if (provider === 'Photon') {
+      // The public Photon instance does not promise 'ar' support. Local names
+      // remain searchable without asking it to return an unsupported language.
+      url.searchParams.set('lang', 'default');
+    } else {
+      url.searchParams.set('format', 'jsonv2');
+      url.searchParams.set('addressdetails', '1');
+      url.searchParams.set('accept-language', 'ar,en');
+      // Bias towards Syria without disallowing international routes.
+      url.searchParams.set('viewbox', '35.0,37.5,42.5,32.0');
+    }
+    let data = geocodeCache.get(url.href);
+    if (!data) {
+      data = await getJSON(url.href, controller);
+      if (geocodeCache.size >= 25) geocodeCache.delete(geocodeCache.keys().next().value);
+      geocodeCache.set(url.href, data);
+    }
+    if (provider === 'Photon') {
+      return (Array.isArray(data.features) ? data.features : []).map(f => ({
+        lat: f.geometry && f.geometry.coordinates && f.geometry.coordinates[1],
+        lon: f.geometry && f.geometry.coordinates && f.geometry.coordinates[0],
+        label: placeName(f)
+      })).filter(valid);
+    }
+    return (Array.isArray(data) ? data : []).map(p => ({
+      lat: Number(p.lat), lon: Number(p.lon),
+      label: p.display_name || p.name || 'مكان بلا اسم'
+    })).filter(valid);
+  }
+  async function searchPlace(which) {
     const query = $('map-' + which + '-input').value.trim();
     const resultList = $('map-' + which + '-results');
-    if (query.length < 2) {status('اكتب اسم مكان أو عنوان من حرفين على الأقل.', true); return;}
-    if (!navigator.onLine) {status('البحث يحتاج اتصالاً بالإنترنت.', true); return;}
+    if (query.length < 2) {
+      status('اكتب اسم مكان أو عنوان من حرفين على الأقل.', true); return false;
+    }
+    if (!navigator.onLine) {status('البحث يحتاج اتصالاً بالإنترنت.', true); return false;}
     if (Date.now() - lastSearchTime < 1100) {
-      status('انتظر ثانية بين عمليات البحث لحماية الخدمة المجانية.', true); return;
+      status('انتظر ثانية بين عمليات البحث لحماية الخدمة المجانية.', true); return false;
     }
     lastSearchTime = Date.now();
     if (searches[which]) searches[which].abort();
     const controller = new AbortController();
     searches[which] = controller;
     const id = ++searchSeq[which];
+    const button = $('map-' + which + '-search');
+    button.disabled = true;
     resultList.replaceChildren();
-    status('عم نبحث عن «' + query + '»…');
+    status('جاري البحث عن «' + query + '»…');
+    // Nominatim public: explicit user-initiated searches only, never autocomplete.
+    // Arabic names work better there; English tries Photon first.
+    const providers = /[\u0600-\u06FF]/.test(query)
+      ? ['Nominatim', 'Photon'] : ['Photon', 'Nominatim'];
+    const failures = [];
+    let succeeded = false;
     try {
-      const url = new URL(CONFIG.geocoder);
-      url.searchParams.set('q', query);
-      url.searchParams.set('lang', 'ar');
-      url.searchParams.set('limit', '5');
-      const data = geocodeCache.has(url.href) ? geocodeCache.get(url.href) : await getJSON(url.href, controller);
-      if (id !== searchSeq[which]) return;
-      if (!geocodeCache.has(url.href)) {
-        if (geocodeCache.size >= 25) geocodeCache.delete(geocodeCache.keys().next().value);
-        geocodeCache.set(url.href, data);
+      for (const provider of providers) {
+        if (controller.signal.aborted) return false;
+        try {
+          const places = await queryProvider(provider, query, controller);
+          if (id !== searchSeq[which] || controller.signal.aborted) return false;
+          succeeded = true;
+          if (!places.length) continue;
+          for (const place of places) {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'map-search-result';
+            item.textContent = place.label;
+            item.addEventListener('click', () => setPoint(which, place, place.label));
+            resultList.append(item);
+          }
+          status('تم العثور على ' + places.length + ' نتائج عبر ' + provider +
+            '. اختر المكان الصحيح من القائمة.');
+          return true;
+        } catch (error) {
+          if (controller.signal.aborted || id !== searchSeq[which]) return false;
+          failures.push(describeFailure(error, provider));
+        }
       }
-      const places = (Array.isArray(data.features) ? data.features : []).filter(f => {
-        const c = f.geometry && f.geometry.coordinates;
-        return Array.isArray(c) && valid({lat: c[1], lon: c[0]});
-      });
-      if (!places.length) {status('ما لقينا نتائج. جرّب اسم المحافظة أو البلد.', true); return false;}
-      if (autoSelect) {
-        const first = places[0];
-        setPoint(which, {lon: first.geometry.coordinates[0], lat: first.geometry.coordinates[1]}, placeName(first));
-        return true;
+      if (id === searchSeq[which]) {
+        status(succeeded && !failures.length
+          ? 'لم يتم العثور على مكان. جرّب اسم المدينة أو اكتب الاسم بالإنجليزية، أو اضغط على الخريطة.'
+          : 'تعذّر إكمال البحث: ' + failures.join('؛ ') +
+            '. يمكنك تحديد الموقع مباشرة على الخريطة.', true);
       }
-      for (const f of places) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'map-search-result';
-        const name = placeName(f);
-        button.textContent = name;
-        button.addEventListener('click', () =>
-          setPoint(which, {lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1]}, name));
-        resultList.append(button);
-      }
-      status('اختر المكان الصحيح من نتائج البحث.');
-      return true;
-    } catch (e) {
-      if (id === searchSeq[which]) status('خدمة البحث غير متاحة حالياً. حاول مجدداً.', true);
+      return false;
     } finally {
       if (searches[which] === controller) searches[which] = null;
+      button.disabled = false;
     }
   }
   function useGPS() {
@@ -214,17 +286,8 @@
   }
   async function route() {
     if (!valid(endpoints.start) || !valid(endpoints.end)) {
-      for (const which of ['start', 'end']) {
-        if (!valid(endpoints[which]) && $('map-' + which + '-input').value.trim().length >= 2) {
-          status('عم نحدد ' + (which === 'start' ? 'نقطة الانطلاق' : 'الوجهة') + ' من النص المكتوب…');
-          const found = await searchPlace(which, true);
-          if (!found) return;
-        }
-      }
-      if (!valid(endpoints.start) || !valid(endpoints.end)) {
-        status('حدد الانطلاق والوجهة عبر البحث أو بالضغط على الخريطة. كتابة الاسم وحدها لا تحدد الموقع.', true);
-        return;
-      }
+      status('حدد الانطلاق والوجهة باختيار نتيجة البحث أو بالضغط على الخريطة. كتابة الاسم وحدها لا تكفي.', true);
+      return;
     }
     if (!navigator.onLine) {status('حساب مسار جديد يحتاج الإنترنت. الحاسبة اليدوية تعمل.', true); return;}
     if (routeController) return;
@@ -265,7 +328,8 @@
       } catch (e) {}
       status('تم تحديث الحاسبة. مدة القيادة تقديرية دون بيانات مرور مباشرة.');
     } catch (e) {
-      if (id === routeSeq) status('تعذّر حساب الطريق. لم نستخدم مسافة خط مستقيم ولم نغيّر الحاسبة.', true);
+      if (id === routeSeq) status(describeFailure(e, 'OSRM') +
+        '. لم نستخدم مسافة خط مستقيم ولم نغيّر المسافة في الحاسبة.', true);
     } finally {
       if (routeController === controller) routeController = null;
       $('map-route-button').disabled = false;
