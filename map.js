@@ -143,7 +143,7 @@
     return [...new Set([p.name, p.street, p.city, p.state, p.country].filter(Boolean))]
       .join('، ') || 'مكان بلا اسم';
   }
-  async function searchPlace(which) {
+  async function searchPlace(which, autoSelect = false) {
     const query = $('map-' + which + '-input').value.trim();
     const resultList = $('map-' + which + '-results');
     if (query.length < 2) {status('اكتب اسم مكان أو عنوان من حرفين على الأقل.', true); return;}
@@ -173,7 +173,12 @@
         const c = f.geometry && f.geometry.coordinates;
         return Array.isArray(c) && valid({lat: c[1], lon: c[0]});
       });
-      if (!places.length) {status('ما لقينا نتائج. جرّب اسم المحافظة أو البلد.', true); return;}
+      if (!places.length) {status('ما لقينا نتائج. جرّب اسم المحافظة أو البلد.', true); return false;}
+      if (autoSelect) {
+        const first = places[0];
+        setPoint(which, {lon: first.geometry.coordinates[0], lat: first.geometry.coordinates[1]}, placeName(first));
+        return true;
+      }
       for (const f of places) {
         const button = document.createElement('button');
         button.type = 'button';
@@ -185,6 +190,7 @@
         resultList.append(button);
       }
       status('اختر المكان الصحيح من نتائج البحث.');
+      return true;
     } catch (e) {
       if (id === searchSeq[which]) status('خدمة البحث غير متاحة حالياً. حاول مجدداً.', true);
     } finally {
@@ -208,7 +214,17 @@
   }
   async function route() {
     if (!valid(endpoints.start) || !valid(endpoints.end)) {
-      status('حدد الانطلاق والوجهة أولاً.', true); return;
+      for (const which of ['start', 'end']) {
+        if (!valid(endpoints[which]) && $('map-' + which + '-input').value.trim().length >= 2) {
+          status('عم نحدد ' + (which === 'start' ? 'نقطة الانطلاق' : 'الوجهة') + ' من النص المكتوب…');
+          const found = await searchPlace(which, true);
+          if (!found) return;
+        }
+      }
+      if (!valid(endpoints.start) || !valid(endpoints.end)) {
+        status('حدد الانطلاق والوجهة عبر البحث أو بالضغط على الخريطة. كتابة الاسم وحدها لا تحدد الموقع.', true);
+        return;
+      }
     }
     if (!navigator.onLine) {status('حساب مسار جديد يحتاج الإنترنت. الحاسبة اليدوية تعمل.', true); return;}
     if (routeController) return;
