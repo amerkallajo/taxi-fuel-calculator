@@ -8,6 +8,8 @@ const assert = require('node:assert/strict');
   const page = await browser.newPage({viewport:{width:390,height:844},isMobile:true,
     hasTouch:true,locale:'ar-SY'});
   page.on('pageerror', e => console.log('WEBKIT PAGE ERROR', e.message));
+  page.on('request', r => {if (/osrm|nominatim/.test(r.url())) console.log('WEBKIT REQUEST', r.method(), r.url());});
+  page.on('response', r => {if (/osrm|nominatim/.test(r.url())) console.log('WEBKIT RESPONSE', r.status(), r.url());});
   page.on('requestfailed', r => console.log('WEBKIT REQUEST FAILED', r.url(), r.failure()?.errorText));
   await page.addInitScript(() => {
     window.localStorage.setItem('taxi-fuel-offline-v1',
@@ -58,8 +60,18 @@ const assert = require('node:assert/strict');
       status:document.querySelector('#map-status').textContent,
       distance:document.querySelector('#distance').value
     }))));
-    await page.waitForFunction(() => document.querySelector('#distance').value==='150.00',
-      {timeout:15000});
+    try {
+      await page.waitForFunction(() => document.querySelector('#distance').value==='150.00',
+        null, {timeout:15000});
+    } catch (e) {
+      console.log('WEBKIT FINAL', JSON.stringify(await page.evaluate(() => ({
+        start:document.querySelector('#map-start-input').value,
+        end:document.querySelector('#map-end-input').value,
+        status:document.querySelector('#map-status').textContent,
+        distance:document.querySelector('#distance').value
+      }))));
+      throw e;
+    }
     assert.match(await page.locator('#consumption').innerText(), /15/);
     await page.waitForFunction(() => document.querySelector('#cost-number').textContent.includes('180,000'));
     await page.locator('#roundtrip').check();
