@@ -7,6 +7,8 @@ const assert = require('node:assert/strict');
   const browser = await webkit.launch({headless:true});
   const page = await browser.newPage({viewport:{width:390,height:844},isMobile:true,
     hasTouch:true,locale:'ar-SY'});
+  page.on('pageerror', e => console.log('WEBKIT PAGE ERROR', e.message));
+  page.on('requestfailed', r => console.log('WEBKIT REQUEST FAILED', r.url(), r.failure()?.errorText));
   await page.addInitScript(() => {
     window.localStorage.setItem('taxi-fuel-offline-v1',
       JSON.stringify({efficiency:'10',price:'12000',currency:'ل.س'}));
@@ -50,7 +52,14 @@ const assert = require('node:assert/strict');
       'Must not route until a search result is selected');
     await page.locator('#map-end-results button').first().click();
     await page.locator('#map-route-button').click();
-    await page.waitForFunction(() => document.querySelector('#distance').value==='150.00');
+    console.log('WEBKIT DEBUG', JSON.stringify(await page.evaluate(() => ({
+      start:document.querySelector('#map-start-input').value,
+      end:document.querySelector('#map-end-input').value,
+      status:document.querySelector('#map-status').textContent,
+      distance:document.querySelector('#distance').value
+    }))));
+    await page.waitForFunction(() => document.querySelector('#distance').value==='150.00',
+      {timeout:15000});
     assert.match(await page.locator('#consumption').innerText(), /15/);
     await page.waitForFunction(() => document.querySelector('#cost-number').textContent.includes('180,000'));
     await page.locator('#roundtrip').check();
