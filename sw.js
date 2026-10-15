@@ -1,5 +1,5 @@
-/* RoadCost v7 — offline cache, versioned assets, iOS + Android */
-const CACHE_NAME = 'road-cost-offline-v7';
+/* RoadCost v8 — offline cache, versioned assets, iOS + Android */
+const CACHE_NAME = 'road-cost-offline-v8';
 const CACHE_PREFIX = 'road-cost-offline-';
 const OLD_CACHE_PREFIX = 'taxi-fuel-offline-';
 const URLS = [
