@@ -110,7 +110,7 @@
         <button id="map-route-button" type="button" class="action primary map-calculate">احسب الطريق</button>
         <div id="map-result" class="map-result" hidden><strong id="map-result-title">مسافة الطريق باتجاه واحد</strong><div class="map-stats"><div><span>المسافة</span><b id="map-km" dir="ltr">—</b></div><div><span>الوقت المتوقع</span><b id="map-duration">—</b></div></div></div>
         <p id="map-status" class="map-status" role="status" aria-live="polite">الخريطة والبحث يحتاجان اتصالاً بالإنترنت. الحاسبة اليدوية تعمل أوفلاين.</p>
-        <p class="map-privacy">لا نطلب GPS إلا عند ضغط «استخدم موقعي». يتم إرسال عبارة البحث لخدمة Photon، ونقطتي الرحلة لـ OSRM عند الحساب. الخرائط من OpenStreetMap. آخر مسافة والمدة فقط محفوظتان محلياً دون إحداثيات.</p>
+        <p class="map-privacy">لا نطلب GPS إلا عند ضغط «استخدم موقعي». يتم إرسال عبارة البحث لخدمتي Nominatim أو Photon عند البحث فقط، وإحداثيات الرحلة إلى OSRM عند الحساب. نتائج البحث من OpenStreetMap، وقد تختلف دقتها. الخرائط من OpenStreetMap. آخر مسافة والمدة فقط محفوظتان محلياً دون إحداثيات.</p>
       </div>
     </details>
 
@@ -158,6 +158,6 @@
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script defer src="./app.js?v=5"></script>
-  <script defer src="./map.js?v=8"></script>
+  <script defer src="./map.js?v=9"></script>
 </body>
 </html>
