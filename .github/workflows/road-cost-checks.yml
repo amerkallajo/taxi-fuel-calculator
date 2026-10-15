@@ -1,0 +1,22 @@
+name: Road Cost regression checks
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check map.js
+          node --check sw.js
+      - name: Run map integration regression checks
+        run: node tests/map.test.js
