@@ -20,3 +20,36 @@ jobs:
           node --check sw.js
       - name: Run map integration regression checks
         run: node tests/map.test.js
+  webkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright and WebKit browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps webkit
+      - name: Run Safari-engine browser integration
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/roadcost_http.log 2>&1 &
+          node tests/webkit.smoke.cjs
+  live-services:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    # Third-party demo availability is reported separately, not mistaken for
+    # an application regression. Inspect this job even if other jobs pass.
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe real geocoding and routing services
+        run: node tests/live-services.cjs
