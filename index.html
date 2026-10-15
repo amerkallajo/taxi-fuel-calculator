@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest?v=6">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/road-cost-180.png?v=6">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/road-cost-192.png?v=6">
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=7">
   <title>حاسبة تكاليف الطريق | ROAD COST</title>
 </head>
 <body>
@@ -90,6 +90,30 @@
       </div>
     </section>
 
+
+    <details class="map-panel intro" id="map-section">
+      <summary class="map-summary"><span class="map-summary-icon" aria-hidden="true">▣</span><span><strong>احسب المسافة على الخريطة</strong><small>حدد الانطلاق والوجهة لتحسب الطريق الحقيقي</small></span><span class="map-chevron" aria-hidden="true">⌄</span></summary>
+      <div class="map-panel-body">
+        <div class="map-input-group">
+          <label for="map-start-input">من وين؟ <span class="map-dot map-dot-start" aria-hidden="true"></span></label>
+          <div class="map-entry"><input id="map-start-input" type="search" placeholder="مثلاً: دمشق، المزة" autocomplete="off" enterkeyhint="search"><button id="map-start-search" type="button">بحث</button></div>
+          <div id="map-start-results" class="map-search-results" aria-label="نتائج بحث الانطلاق"></div>
+        </div>
+        <div class="map-middle-actions"><button id="map-gps" type="button">⌖ استخدم موقعي الحالي</button><button id="map-swap" type="button" title="تبديل الاتجاه">⇅ تبديل الاتجاه</button></div>
+        <div class="map-input-group">
+          <label for="map-end-input">لوين؟ <span class="map-dot map-dot-end" aria-hidden="true"></span></label>
+          <div class="map-entry"><input id="map-end-input" type="search" placeholder="مثلاً: حمص، سوريا" autocomplete="off" enterkeyhint="search"><button id="map-end-search" type="button">بحث</button></div>
+          <div id="map-end-results" class="map-search-results" aria-label="نتائج بحث الوجهة"></div>
+        </div>
+        <div class="map-pick-row" role="group" aria-label="ما الذي تريد تحديده بالنقر على الخريطة؟"><span>اضغط على الخريطة لتحديد:</span><button data-map-pick="start" type="button" aria-pressed="false">الانطلاق</button><button data-map-pick="end" type="button" aria-pressed="true">الوجهة</button></div>
+        <div id="road-map" class="road-map" role="region" aria-label="خريطة تفاعلية لتحديد مواقع الرحلة"></div>
+        <button id="map-route-button" type="button" class="action primary map-calculate">احسب الطريق</button>
+        <div id="map-result" class="map-result" hidden><strong id="map-result-title">مسافة الطريق باتجاه واحد</strong><div class="map-stats"><div><span>المسافة</span><b id="map-km" dir="ltr">—</b></div><div><span>الوقت المتوقع</span><b id="map-duration">—</b></div></div></div>
+        <p id="map-status" class="map-status" role="status" aria-live="polite">الخريطة والبحث يحتاجان اتصالاً بالإنترنت. الحاسبة اليدوية تعمل أوفلاين.</p>
+        <p class="map-privacy">لا نطلب GPS إلا عند ضغط «استخدم موقعي». يتم إرسال عبارة البحث لخدمة Photon، ونقطتي الرحلة لـ OSRM عند الحساب. الخرائط من OpenStreetMap. آخر مسافة والمدة فقط محفوظتان محلياً دون إحداثيات.</p>
+      </div>
+    </details>
+
     <label class="toggle-area intro" for="roundtrip">
       <div class="toggle-copy">
         <div class="toggle-icon">
@@ -134,5 +158,6 @@
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script defer src="./app.js?v=5"></script>
+  <script defer src="./map.js?v=7"></script>
 </body>
 </html>
