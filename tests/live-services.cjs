@@ -44,6 +44,18 @@ async function check(name, url, verify) {
     if (!Array.isArray(data.features) || !data.features.length) throw Error('No features');
     return {results:data.features.length, name:data.features[0].properties?.name};
   });
+  // Reproduce the legacy request and record its actual HTTP outcome.
+  const oldPhoton = new URL('https://photon.komoot.io/api/');
+  oldPhoton.searchParams.set('q', 'حمص');
+  oldPhoton.searchParams.set('lang', 'ar');
+  oldPhoton.searchParams.set('limit', '5');
+  try {
+    const res = await fetch(oldPhoton, {headers, signal:AbortSignal.timeout(12000)});
+    console.log('LIVE DIAGNOSTIC Photon lang=ar:', res.status,
+      (await res.text()).slice(0, 230));
+  } catch (error) {
+    console.log('LIVE DIAGNOSTIC Photon lang=ar unreachable:', error.message);
+  }
   const osrm = 'https://router.project-osrm.org/route/v1/driving/' +
     '36.291300,33.513800;36.716700,34.733300?overview=full&geometries=geojson&steps=false';
   await check('OSRM Damascus to Homs', osrm, data => {
