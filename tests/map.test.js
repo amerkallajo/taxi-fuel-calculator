@@ -119,7 +119,7 @@ async function main() {
     })};
   }
   const context = {
-    document, window, navigator, localStorage, fetch, URL,
+    document, window, navigator, localStorage, fetch, URL, L: window.L,
     Date: class extends Date {static now() {return now;}},
     AbortController, Event: class {constructor(type) {this.type = type;}},
     setTimeout: () => 0, clearTimeout() {},
