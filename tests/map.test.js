@@ -175,10 +175,10 @@ async function main() {
   assert.equal(JSON.parse(saved.get('taxi-fuel-offline-v1')).price, '12000');
   const sw = fs.readFileSync('sw.js', 'utf8');
   const html = fs.readFileSync('index.html', 'utf8');
-  assert.ok(sw.includes("road-cost-offline-v7"));
-  assert.ok(sw.includes("'./map.js?v=7'"));
+  assert.ok(sw.includes("road-cost-offline-v8"));
+  assert.ok(sw.includes("'./map.js?v=8'"));
   assert.ok(html.includes('<script defer src="./app.js?v=5"></script>'));
-  assert.ok(html.includes('<script defer src="./map.js?v=7"></script>'));
+  assert.ok(html.includes('<script defer src="./map.js?v=8"></script>'));
   assert.ok(html.includes('icons/road-cost-180.png?v=6'));
   console.log('PASS: GPS, Arabic search, OSRM routing, cost, round trip, NoRoute, offline manual, PWA cache, saved settings');
 }
