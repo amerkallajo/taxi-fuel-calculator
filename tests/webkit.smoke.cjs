@@ -5,8 +5,11 @@ const assert = require('node:assert/strict');
 
 (async () => {
   const browser = await webkit.launch({headless:true});
-  const page = await browser.newPage({viewport:{width:390,height:844},isMobile:true,
-    hasTouch:true,locale:'ar-SY'});
+  // Playwright cannot intercept requests handled by an active Service Worker.
+  // Block it in this deterministic mocked test; SW is tested separately.
+  const context = await browser.newContext({viewport:{width:390,height:844},isMobile:true,
+    hasTouch:true,locale:'ar-SY',serviceWorkers:'block'});
+  const page = await context.newPage();
   page.on('pageerror', e => console.log('WEBKIT PAGE ERROR', e.message));
   page.on('request', r => {if (/osrm|nominatim/.test(r.url())) console.log('WEBKIT REQUEST', r.method(), r.url());});
   page.on('response', r => {if (/osrm|nominatim/.test(r.url())) console.log('WEBKIT RESPONSE', r.status(), r.url());});
