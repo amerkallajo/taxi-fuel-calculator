@@ -1,0 +1,7 @@
+vendor/
+fonts/
+output/
+test-results/
+playwright-report/
+package-lock.json
+.playwright-mcp/

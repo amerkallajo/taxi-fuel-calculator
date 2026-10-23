@@ -1,0 +1,7 @@
+node_modules/
+output/
+test-results/
+playwright-report/
+.playwright-mcp/
+road-cost-before.png
+*.log

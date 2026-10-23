@@ -1,163 +1,889 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#070b12">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="تكاليف الطريق">
-  <meta name="description" content="حاسبة تكاليف الطريق: احسب تكلفة وقود رحلتك، البنزين المستهلك وتكلفة الكيلومتر؛ تعمل بدون إنترنت.">
-  <link rel="manifest" href="./manifest.webmanifest?v=6">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/road-cost-180.png?v=6">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/road-cost-192.png?v=6">
-  <link rel="stylesheet" href="./styles.css?v=7">
-  <title>حاسبة تكاليف الطريق | ROAD COST</title>
-</head>
-<body>
-  <main class="wrap">
-    <header class="header">
-      <div class="identity">
-        <div class="brandmark app-icon" aria-hidden="true"><img src="./icons/road-cost.svg?v=5" alt="" width="52" height="52"></div>
-        <div><div class="kicker">ROAD COST</div><h1>حاسبة تكاليف الطريق</h1></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f6fb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Road Cost" />
+    <meta
+      name="description"
+      content="Road Cost – حاسبة تكاليف الطريق. خطط رحلتك، قارن سياراتك، واقسم تكاليف الوقود. حاسبة عربية خاصة تعمل دون إنترنت."
+    />
+    <link rel="manifest" href="./manifest.webmanifest?v=10" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/road-cost-180.png?v=6" />
+    <link rel="icon" type="image/svg+xml" href="./icons/road-cost.svg?v=5" />
+    <link rel="stylesheet" href="./styles.css?v=10" />
+    <title>Road Cost – حاسبة تكاليف الطريق</title>
+  </head>
+  <body>
+    <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <symbol id="i-route" viewBox="0 0 24 24">
+          <circle cx="5" cy="18" r="2" />
+          <circle cx="19" cy="6" r="2" />
+          <path d="M7 18h8a4 4 0 0 0 0-8H9a4 4 0 0 1 0-8h5" />
+        </symbol>
+        <symbol id="i-car" viewBox="0 0 24 24">
+          <path d="m4 13 3-7h10l3 7M3 13h18v6H3zm3 6v2m12-2v2M6 16h2m8 0h2" />
+        </symbol>
+        <symbol id="i-history" viewBox="0 0 24 24">
+          <path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2" />
+        </symbol>
+        <symbol id="i-map" viewBox="0 0 24 24">
+          <path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2zm6-2v16m6-14v16" />
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24">
+          <path d="M4 7h16M4 17h16" />
+          <circle cx="8" cy="7" r="3" />
+          <circle cx="16" cy="17" r="3" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+          <path d="M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+        <symbol id="i-share" viewBox="0 0 24 24">
+          <path d="M12 16V3m-4 4 4-4 4 4M7 10H4v11h16V10h-3" />
+        </symbol>
+        <symbol id="i-fuel" viewBox="0 0 24 24">
+          <path d="M4 20V4h10v16M4 10h10M2 20h14m0-15 4 4v9a2 2 0 0 1-4 0v-5h-2" />
+        </symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24">
+          <circle cx="12" cy="10" r="3" />
+          <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" />
+        </symbol>
+        <symbol id="i-swap" viewBox="0 0 24 24">
+          <path d="M4 7h15l-4-4m4 4-4 4M20 17H5l4-4m-4 4 4 4" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6" /></symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z" />
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+          <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" />
+        </symbol>
+      </defs>
+    </svg>
+    <a class="skip-link" href="#main" data-en="Skip to content">انتقل إلى المحتوى</a>
+    <aside class="sidebar">
+      <a href="#trip" class="brand" aria-label="Road Cost"
+        ><img src="./icons/road-cost.svg?v=5" width="44" height="44" alt="" /><span
+          ><b dir="ltr">road cost<span class="brand-period">.</span></b
+          ><small data-en="Every trip, accounted for.">كل مشوار، محسوب.</small></span
+        ></a
+      >
+      <div class="sidebar-label" data-en="YOUR ROAD COMPANION">رفيقك على الطريق</div>
+      <nav class="navigation" aria-label="التنقل الرئيسي" data-en-aria="Main navigation">
+        <a href="#trip" data-view="trip" aria-current="page"
+          ><svg class="i"><use href="#i-route" /></svg><span data-en="Plan a trip">خطّط رحلة</span
+          ><span class="nav-dot"></span
+        ></a>
+        <a href="#garage" data-view="garage"
+          ><svg class="i"><use href="#i-car" /></svg><span data-en="My vehicles">سياراتي</span></a
+        >
+        <a href="#journal" data-view="journal"
+          ><svg class="i"><use href="#i-history" /></svg
+          ><span data-en="Trip journal">سجل الرحلات</span
+          ><span id="trip-count" class="nav-count">0</span></a
+        >
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-mark">
+          <span class="privacy-dot"></span
+          ><span data-en="Your data stays with you">بياناتك تبقى عندك</span>
+        </div>
+        <p data-en="No account. No tracking. Just your next journey.">
+          بلا حساب. بلا تتبّع.<br />أنت والطريق وبس.
+        </p>
+        <button id="open-settings" class="text-button">
+          <svg class="i"><use href="#i-settings" /></svg
+          ><span data-en="Settings & backup">الإعدادات والنسخ الاحتياطي</span>
+        </button>
+        <div class="build-label">ROAD COST / 4.0</div>
       </div>
-      <button class="status" id="connectivity" type="button" title="التحقق من النسخة الأحدث" aria-label="التحقق من تحديث التطبيق"><i aria-hidden="true"></i><span id="connection-label">تحديث التطبيق</span><svg class="refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-3 7M20 4v7h-7"/></svg></button>
-    </header>
-
-    <section class="hero intro" aria-label="تكلفة المشوار">
-      <div class="hero-eyebrow">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20m5-15.5a4.5 4.5 0 0 0-4.5-2H10a3.5 3.5 0 0 0 0 7h4a3.5 3.5 0 0 1 0 7H11a4.5 4.5 0 0 1-4.5-2"/></svg>
-        تكلفة بنزين المشوار
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="mobile-brand">
+          <img src="./icons/road-cost.svg?v=5" width="32" height="32" alt="" /><b dir="ltr"
+            >road cost.</b
+          >
+        </div>
+        <div class="breadcrumb">
+          <span data-en="Your space">مساحتك</span><span>/</span><b id="page-label">خطّط رحلة</b>
+        </div>
+        <div class="top-actions">
+          <span class="connection" id="connectivity"
+            ><i></i><span id="connection-label">جاهز للطريق</span></span
+          ><button id="language" class="icon-button language-button" aria-label="Switch to English">
+            EN</button
+          ><button
+            id="theme"
+            class="icon-button"
+            aria-label="تغيير المظهر"
+            data-en-aria="Toggle theme"
+          >
+            <svg class="i"><use href="#i-sun" /></svg></button
+          ><button
+            id="mobile-settings"
+            class="icon-button mobile-settings"
+            aria-label="الإعدادات"
+            data-en-aria="Settings"
+          >
+            <svg class="i"><use href="#i-settings" /></svg>
+          </button>
+        </div>
+      </header>
+      <div id="update-banner" class="notice" hidden>
+        <span data-en="An update is ready. Your draft will be kept."
+          >نسخة جديدة جاهزة. سنحتفظ بمدخلات رحلتك.</span
+        ><button id="apply-update" class="text-button" data-en="Update now">تحديث الآن</button>
       </div>
-      <div class="value-row" aria-live="polite" aria-atomic="true">
-        <span id="cost-number" class="hero-value">—</span>
-        <span id="cost-unit" class="hero-unit"></span>
-      </div>
-      <div class="hero-hint" id="cost-hint">أدخل سعر اللتر لتشوف تكلفة المشوار</div>
-      <div class="route" aria-hidden="true">
-        <div class="route-start">الانطلاق</div>
-        <div class="route-track">
-          <div class="route-car">
-            <svg viewBox="0 0 24 24" stroke="#09251b" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13 7 8h10l2 5m-14 0h14a2 2 0 0 1 2 2v3H3v-3a2 2 0 0 1 2-2Zm1 5v2m12-2v2"/></svg>
+      <div id="storage-warning" class="notice warning" role="status" hidden></div>
+      <main id="main" tabindex="-1">
+        <section id="view-trip" class="view" aria-labelledby="trip-heading">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">
+                <span class="tiny-line"></span
+                ><span data-en="A LITTLE PLANNING. A BETTER JOURNEY.">حسبة صغيرة. رحلة أريح.</span>
+              </div>
+              <h1 id="trip-heading" data-en="Where are we heading?">إلى أين اليوم؟</h1>
+              <p data-en="Know your fuel, plan your budget, and enjoy the road.">
+                اعرف مصروفك، رتّب ميزانيتك، وخلي بالك عالطريق.
+              </p>
+            </div>
+            <div class="heading-stamp" aria-hidden="true">
+              <svg class="i"><use href="#i-route" /></svg><span>LET’S<br />GO PLACES.</span>
+            </div>
+          </div>
+          <div class="trip-layout">
+            <div class="trip-inputs">
+              <section class="card planner" aria-labelledby="details-heading">
+                <div class="card-heading">
+                  <h2 id="details-heading">
+                    <svg class="i"><use href="#i-route" /></svg
+                    ><span data-en="Your trip">تفاصيل الرحلة</span>
+                  </h2>
+                  <span class="pill" data-en="Live calculation">حساب مباشر</span>
+                </div>
+                <div class="field distance-field">
+                  <div class="label-row">
+                    <label for="distance" data-en="One-way distance">مسافة الاتجاه الواحد</label
+                    ><span id="distance-source" class="source-tag">إدخال يدوي</span>
+                  </div>
+                  <div class="large-input">
+                    <input
+                      id="distance"
+                      type="text"
+                      inputmode="decimal"
+                      value="20"
+                      maxlength="16"
+                      autocomplete="off"
+                      aria-describedby="error-distance"
+                    /><span data-en="km">كم</span>
+                  </div>
+                  <p id="error-distance" class="field-error" role="status"></p>
+                  <div class="quick">
+                    <button data-distance="10" type="button">10 <span data-en="km">كم</span></button
+                    ><button data-distance="20" type="button" aria-pressed="true">
+                      20 <span data-en="km">كم</span></button
+                    ><button data-distance="50" type="button">
+                      50 <span data-en="km">كم</span></button
+                    ><button data-distance="100" type="button">
+                      100 <span data-en="km">كم</span></button
+                    ><button id="open-map" type="button" class="map-shortcut">
+                      <svg class="i"><use href="#i-map" /></svg
+                      ><span data-en="Use map">من الخريطة</span>
+                    </button>
+                  </div>
+                </div>
+                <details id="map-section" class="map-panel">
+                  <summary>
+                    <svg class="i"><use href="#i-map" /></svg
+                    ><span data-en="Find a driving route">احسب طريق السيارة</span
+                    ><span class="chevron">⌄</span>
+                  </summary>
+                  <div class="map-panel-body">
+                    <div class="map-input-group">
+                      <label for="map-start-input"
+                        ><span class="map-dot start"></span
+                        ><span data-en="From">الانطلاق</span></label
+                      >
+                      <div class="map-entry">
+                        <input
+                          id="map-start-input"
+                          type="search"
+                          placeholder="دمشق، المزة…"
+                          data-en-placeholder="Damascus, Mezzeh…"
+                          autocomplete="off"
+                          maxlength="160"
+                        /><button id="map-start-search" data-en="Search">بحث</button>
+                      </div>
+                      <div
+                        id="map-start-results"
+                        class="map-search-results"
+                        aria-label="نتائج الانطلاق"
+                        data-en-aria="Origin search results"
+                      ></div>
+                    </div>
+                    <div class="map-middle-actions">
+                      <button id="map-gps">
+                        <svg class="i"><use href="#i-pin" /></svg
+                        ><span data-en="My location">استخدم موقعي</span></button
+                      ><button id="map-swap">
+                        <svg class="i"><use href="#i-swap" /></svg><span data-en="Swap">تبديل</span>
+                      </button>
+                    </div>
+                    <div class="map-input-group">
+                      <label for="map-end-input"
+                        ><span class="map-dot end"></span><span data-en="To">الوجهة</span></label
+                      >
+                      <div class="map-entry">
+                        <input
+                          id="map-end-input"
+                          type="search"
+                          placeholder="حمص، سوريا…"
+                          data-en-placeholder="Homs, Syria…"
+                          autocomplete="off"
+                          maxlength="160"
+                        /><button id="map-end-search" data-en="Search">بحث</button>
+                      </div>
+                      <div
+                        id="map-end-results"
+                        class="map-search-results"
+                        aria-label="نتائج الوجهة"
+                        data-en-aria="Destination search results"
+                      ></div>
+                    </div>
+                    <div class="map-pick-row">
+                      <span data-en="Tap map to set">حدّد على الخريطة:</span
+                      ><button data-map-pick="start" aria-pressed="false" data-en="Origin">
+                        الانطلاق</button
+                      ><button data-map-pick="end" aria-pressed="true" data-en="Destination">
+                        الوجهة
+                      </button>
+                    </div>
+                    <div
+                      id="road-map"
+                      class="road-map"
+                      role="region"
+                      aria-label="خريطة الرحلة"
+                      data-en-aria="Interactive trip map"
+                    ></div>
+                    <button id="map-route-button" class="button primary full">
+                      <svg class="i"><use href="#i-route" /></svg
+                      ><span data-en="Calculate road route">احسب الطريق</span>
+                    </button>
+                    <div id="map-result" class="map-result" hidden>
+                      <strong id="map-result-title"></strong>
+                      <div><b id="map-km" dir="auto"></b><b id="map-duration" dir="auto"></b></div>
+                    </div>
+                    <p id="map-status" class="map-status" role="status"></p>
+                    <p
+                      class="map-privacy"
+                      data-en="Search is sent to Nominatim / Photon only when you press Search. OSRM receives the selected coordinates. No GPS without your request. New routes need internet."
+                    >
+                      يُرسل البحث إلى Nominatim / Photon عند ضغط بحث فقط، والإحداثيات المختارة إلى
+                      OSRM. لا GPS دون طلبك. المسارات الجديدة تحتاج إنترنت.
+                    </p>
+                    <p class="map-privacy">
+                      ©
+                      <a
+                        href="https://www.openstreetmap.org/copyright"
+                        target="_blank"
+                        rel="noopener"
+                        >OpenStreetMap</a
+                      >
+                      · <a href="https://project-osrm.org/" target="_blank" rel="noopener">OSRM</a>
+                    </p>
+                  </div>
+                </details>
+                <label class="toggle-row" for="roundtrip"
+                  ><span
+                    ><b data-en="Round trip">ذهاب وعودة</b
+                    ><small data-en="Double the outbound distance">مضاعفة مسافة الذهاب</small></span
+                  ><input id="roundtrip" type="checkbox" role="switch" /><span
+                    class="switch-track"
+                    aria-hidden="true"
+                  ></span
+                ></label>
+                <div class="divider"></div>
+                <div class="label-row vehicle-row">
+                  <label for="vehicle-select" data-en="Vehicle settings">إعدادات السيارة</label
+                  ><a href="#garage" class="text-link" data-en="My vehicles">سياراتي ←</a>
+                </div>
+                <select
+                  id="vehicle-select"
+                  aria-label="اختيار السيارة"
+                  data-en-aria="Choose vehicle"
+                >
+                  <option value="" data-en="Custom vehicle">سيارة مخصصة</option>
+                </select>
+                <div class="two-fields">
+                  <div class="field">
+                    <label for="efficiency" data-en="Fuel efficiency">استهلاك الوقود</label>
+                    <div class="input-with-unit">
+                      <input
+                        id="efficiency"
+                        type="text"
+                        inputmode="decimal"
+                        value="12"
+                        maxlength="18"
+                        aria-describedby="error-efficiency"
+                      /><select
+                        id="efficiency-unit"
+                        aria-label="وحدة الاستهلاك"
+                        data-en-aria="Efficiency unit"
+                      >
+                        <option value="kml">كم/لتر</option>
+                        <option value="l100">لتر/100كم</option>
+                      </select>
+                    </div>
+                    <p id="error-efficiency" class="field-error" role="status"></p>
+                  </div>
+                  <div class="field">
+                    <label for="price" data-en="Price per liter">سعر اللتر</label>
+                    <div class="input-with-unit">
+                      <input
+                        id="price"
+                        type="text"
+                        inputmode="decimal"
+                        placeholder="0"
+                        maxlength="18"
+                        aria-describedby="error-price"
+                      /><span id="price-currency">ل.س</span>
+                    </div>
+                    <p id="error-price" class="field-error" role="status"></p>
+                  </div>
+                </div>
+                <div class="fuel-currency">
+                  <div
+                    class="segmented"
+                    role="group"
+                    aria-label="نوع الوقود"
+                    data-en-aria="Fuel type"
+                  >
+                    <button data-fuel="gasoline" aria-pressed="true" data-en="Gasoline">
+                      بنزين</button
+                    ><button data-fuel="diesel" aria-pressed="false" data-en="Diesel">مازوت</button>
+                  </div>
+                  <select id="currency" aria-label="العملة" data-en-aria="Currency">
+                    <option value="ل.س">ل.س · SYP</option>
+                    <option value="$">$ · USD</option>
+                    <option value="€">€ · EUR</option>
+                    <option value="₺">₺ · TRY</option>
+                  </select>
+                </div>
+                <p
+                  class="field-note"
+                  data-en="Enter your own fuel price. Currencies are not converted."
+                >
+                  أدخل سعر الوقود عندك. تغيير العملة لا يحوّل المبلغ.
+                </p>
+                <details class="budget-details">
+                  <summary>
+                    <svg class="i"><use href="#i-settings" /></svg
+                    ><span data-en="Split costs & fine-tune your budget"
+                      >تقسيم التكلفة وتفاصيل الميزانية</span
+                    ><span class="chevron">⌄</span>
+                  </summary>
+                  <div class="budget-body">
+                    <div class="two-fields">
+                      <div class="field">
+                        <label for="passengers" data-en="People sharing (incl. driver)"
+                          >عدد المشاركين (مع السائق)</label
+                        ><input
+                          id="passengers"
+                          type="text"
+                          inputmode="numeric"
+                          value="1"
+                          maxlength="3"
+                          aria-describedby="error-passengers"
+                        />
+                        <p id="error-passengers" class="field-error" role="status"></p>
+                      </div>
+                      <div class="field">
+                        <label for="extra" data-en="Extra trip costs">مصاريف إضافية للرحلة</label
+                        ><input
+                          id="extra"
+                          type="text"
+                          inputmode="decimal"
+                          value="0"
+                          maxlength="18"
+                          aria-describedby="error-extra"
+                        />
+                        <p id="error-extra" class="field-error" role="status"></p>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="reserve" data-en="Fuel budget cushion (%)"
+                        >هامش احتياط للوقود (%)</label
+                      ><input
+                        id="reserve"
+                        type="text"
+                        inputmode="decimal"
+                        value="0"
+                        maxlength="5"
+                        aria-describedby="error-reserve"
+                      />
+                      <p id="error-reserve" class="field-error" role="status"></p>
+                      <small data-en="A budget allowance, not a change to vehicle consumption."
+                        >احتياط مالي، لا يغيّر استهلاك السيارة.</small
+                      >
+                    </div>
+                  </div>
+                </details>
+              </section>
+              <section class="card favorites-card">
+                <div class="card-heading">
+                  <h2>
+                    <svg class="i"><use href="#i-star" /></svg
+                    ><span data-en="Your regular routes">مشاويرك المعتادة</span>
+                  </h2>
+                  <a href="#journal" class="text-link" data-en="View all">عرض الكل ←</a>
+                </div>
+                <div id="favorites-list"></div>
+              </section>
+            </div>
+            <div class="trip-summary">
+              <section class="estimate-card" aria-labelledby="estimate-heading">
+                <div class="estimate-top">
+                  <span class="estimate-label" id="estimate-heading" data-en="YOUR TRIP BUDGET"
+                    >ميزانية مشوارك</span
+                  ><span class="estimate-badge" data-en="Estimate">تقديرية</span>
+                </div>
+                <div class="cost-line" aria-live="polite" aria-atomic="true">
+                  <strong id="cost-number">—</strong><span id="cost-unit"></span>
+                </div>
+                <p id="cost-hint">أضف سعر اللتر لنحسبها سوا.</p>
+                <div class="route-illustration" aria-hidden="true">
+                  <span class="route-start"><i></i><span data-en="Let’s go">يلا نمشي</span></span
+                  ><svg class="route-art" viewBox="0 0 300 65" fill="none">
+                    <path
+                      d="M8 45h70c45 0 30-30 73-30h35c35 0 28 30 66 30h40"
+                      stroke="#94b3ee"
+                      stroke-opacity=".13"
+                      stroke-width="22"
+                    />
+                    <path
+                      d="M8 45h70c45 0 30-30 73-30h35c35 0 28 30 66 30h40"
+                      stroke="#b5c9ee"
+                      stroke-width="1.5"
+                      stroke-dasharray="5 6"
+                    />
+                    <g transform="translate(144 1)">
+                      <rect width="35" height="28" rx="9" fill="#b8d2ff" />
+                      <path
+                        d="m8 15 3-6h13l3 6M8 15h19v7H8zM12 22v3m11-3v3"
+                        stroke="#243e6d"
+                        stroke-width="1.5"
+                      />
+                    </g></svg
+                  ><span class="route-end"
+                    ><i></i><span data-en="Arrive easy">ونوصل براحة</span></span
+                  >
+                </div>
+                <div class="estimate-metrics">
+                  <div>
+                    <span data-en="Total distance">المسافة الكلية</span
+                    ><strong id="distance-total">20 <small>كم</small></strong>
+                  </div>
+                  <div>
+                    <span data-en="Fuel needed">الوقود المطلوب</span
+                    ><strong id="consumption">1.667 <small>لتر</small></strong>
+                  </div>
+                  <div>
+                    <span data-en="Per kilometer">لكل كيلومتر</span><strong id="per-km">—</strong>
+                  </div>
+                </div>
+                <div class="cost-breakdown">
+                  <div><span data-en="Fuel cost">تكلفة الوقود</span><b id="fuel-cost">—</b></div>
+                  <div>
+                    <span data-en="Budget cushion">هامش الاحتياط</span><b id="reserve-cost">—</b>
+                  </div>
+                  <div>
+                    <span data-en="Extra costs">المصاريف الإضافية</span><b id="extra-cost">—</b>
+                  </div>
+                </div>
+                <div class="split-result">
+                  <span data-en="Each person pays">حصة كل شخص</span
+                  ><strong id="per-person">—</strong>
+                </div>
+                <div class="save-fields">
+                  <label for="trip-name" class="sr-only" data-en="Trip name">اسم الرحلة</label
+                  ><input
+                    id="trip-name"
+                    maxlength="80"
+                    placeholder="اسم المشوار (اختياري)"
+                    data-en-placeholder="Trip name (optional)"
+                  /><label class="favorite-label"
+                    ><input id="save-favorite" type="checkbox" /><svg class="i">
+                      <use href="#i-star" /></svg
+                    ><span data-en="Favorite">مفضلة</span></label
+                  >
+                </div>
+                <div class="result-actions">
+                  <button id="save-trip" class="button save-button" disabled>
+                    <svg class="i"><use href="#i-plus" /></svg
+                    ><span data-en="Save trip">حفظ الرحلة</span></button
+                  ><button
+                    id="copy"
+                    class="button share-button"
+                    disabled
+                    aria-label="مشاركة أو نسخ النتيجة"
+                    data-en-aria="Share or copy summary"
+                  >
+                    <svg class="i"><use href="#i-share" /></svg>
+                  </button>
+                </div>
+                <p
+                  class="estimate-note"
+                  data-en="Fuel + your extras only. No automatic allowance for maintenance or depreciation."
+                >
+                  الوقود وإضافاتك فقط. لا تتضمن صيانة أو استهلاك السيارة تلقائياً.
+                </p>
+              </section>
+              <section class="card commute-card">
+                <div class="card-heading">
+                  <h2>
+                    <svg class="i"><use href="#i-history" /></svg
+                    ><span data-en="What if this is your commute?">ولو هالمشوار كل يوم؟</span>
+                  </h2>
+                </div>
+                <p
+                  data-en="A monthly outlook for the trip above, including your round-trip setting."
+                >
+                  تقدير شهري لنفس الرحلة أعلاه، مع خيار الذهاب والعودة الذي حددته.
+                </p>
+                <div class="commute-control">
+                  <label for="commute-days" data-en="Trips per month">رحلة بالشهر</label
+                  ><input
+                    id="commute-days"
+                    type="text"
+                    inputmode="numeric"
+                    value="22"
+                    maxlength="3"
+                    aria-describedby="error-commute-days"
+                  />
+                  <p id="error-commute-days" class="field-error" role="status"></p>
+                </div>
+                <div class="forecast">
+                  <div><span data-en="Monthly">شهرياً</span><strong id="monthly">—</strong></div>
+                  <div>
+                    <span data-en="Yearly · 12 months">سنوياً · 12 شهر</span
+                    ><strong id="yearly">—</strong>
+                  </div>
+                </div>
+                <p
+                  class="field-note"
+                  data-en="A projection at today’s entered price; never added to your journal automatically."
+                >
+                  توقّع بالسعر الذي أدخلته، ولا يُضاف للسجل تلقائياً.
+                </p>
+              </section>
+            </div>
+          </div>
+          <div class="page-footnote">
+            <svg class="i"><use href="#i-check" /></svg
+            ><span data-en="Your calculator works offline. Maps and new road routes need internet."
+              >الحاسبة معك حتى بلا نت. الخرائط والمسارات الجديدة تحتاج اتصالاً.</span
+            ><button id="reset" class="text-button" data-en="Reset trip">رحلة جديدة</button>
+          </div>
+          <div class="mobile-total-bar">
+            <div>
+              <span data-en="Trip budget">ميزانية المشوار</span
+              ><strong id="mobile-total" dir="auto">—</strong>
+            </div>
+            <button id="show-summary" class="text-button" data-en="See breakdown">
+              تفاصيل الحسبة ↑
+            </button>
+          </div>
+        </section>
+        <section id="view-garage" class="view" hidden aria-labelledby="garage-heading">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow" data-en="YOUR OWN FLEET">كل سيارة، إلها حسبة</div>
+              <h1 id="garage-heading" data-en="Your garage">سياراتك، جاهزة للطريق.</h1>
+              <p data-en="Keep fuel settings for each vehicle and compare the same trip.">
+                احفظ إعدادات كل سيارة وقارن مصروفها لنفس المشوار.
+              </p>
+            </div>
+            <button id="add-vehicle" class="button primary">
+              <svg class="i"><use href="#i-plus" /></svg
+              ><span data-en="Add vehicle">إضافة سيارة</span>
+            </button>
+          </div>
+          <div id="vehicles-list" class="vehicle-grid"></div>
+          <section class="card compare-card">
+            <div class="card-heading">
+              <h2 data-en="Same trip. Different vehicle.">نفس الطريق. سيارة مختلفة.</h2>
+              <span id="compare-distance" class="pill"></span>
+            </div>
+            <p
+              data-en="Fuel only, using each vehicle’s saved price. Compare within the same currency."
+            >
+              تكلفة الوقود فقط، بسعر كل سيارة المحفوظ. المقارنة ضمن نفس العملة.
+            </p>
+            <div id="vehicle-comparison"></div>
+          </section>
+        </section>
+        <section id="view-journal" class="view" hidden aria-labelledby="journal-heading">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow" data-en="SMALL TRIPS. A BIGGER PICTURE.">
+                مشوار ورا مشوار، الصورة بتوضح
+              </div>
+              <h1 id="journal-heading" data-en="Your trip journal">دفتر مشاويرك.</h1>
+              <p
+                data-en="Saved budgets, not proof of actual spending. Everything stays on this device."
+              >
+                ميزانيات محفوظة، وليست مصاريف فعلية. كل شيء على جهازك.
+              </p>
+            </div>
+            <button id="export-csv" class="button secondary">
+              <svg class="i"><use href="#i-download" /></svg
+              ><span data-en="Export CSV">تصدير CSV</span>
+            </button>
+          </div>
+          <div class="journal-toolbar">
+            <label for="journal-month" data-en="Month">الشهر</label
+            ><input type="month" id="journal-month" /><label
+              for="journal-currency"
+              data-en="Currency"
+              >العملة</label
+            ><select id="journal-currency">
+              <option value="ل.س">ل.س · SYP</option>
+              <option value="$">$ · USD</option>
+              <option value="€">€ · EUR</option>
+              <option value="₺">₺ · TRY</option></select
+            ><label class="favorites-filter"
+              ><input type="checkbox" id="favorites-only" /><span data-en="Favorites only"
+                >المفضلة فقط</span
+              ></label
+            >
+          </div>
+          <div class="journal-metrics">
+            <div class="card">
+              <span data-en="Saved budgets">الميزانيات المحفوظة</span
+              ><strong id="journal-total">—</strong>
+            </div>
+            <div class="card">
+              <span data-en="Planned kilometers">كيلومترات مخططة</span
+              ><strong id="journal-km">0</strong>
+            </div>
+            <div class="card">
+              <span data-en="Trips this month">رحلات هذا الشهر</span
+              ><strong id="journal-trips">0</strong>
+            </div>
+          </div>
+          <section class="card chart-card">
+            <div class="card-heading">
+              <h2 data-en="Six months on the road">ستة أشهر على الطريق</h2>
+              <span id="chart-currency" class="pill"></span>
+            </div>
+            <div
+              id="history-chart"
+              class="history-chart"
+              role="img"
+              aria-label="ميزانيات الأشهر الستة"
+              data-en-aria="Six months of saved budgets"
+            ></div>
+            <p
+              class="field-note"
+              data-en="Saved estimates only, grouped by currency. Favorite filter also applies."
+            >
+              تقديرات محفوظة ضمن عملة واحدة. يطبّق فلتر المفضلة أيضاً.
+            </p>
+          </section>
+          <div class="section-heading">
+            <h2 data-en="Saved trips">الرحلات المحفوظة</h2>
+            <span id="history-count"></span>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </section>
+      </main>
+      <footer class="workspace-footer">
+        <span>Road Cost – <span data-en="Road cost calculator">حاسبة تكاليف الطريق</span></span
+        ><button id="install-help" class="text-button">
+          <svg class="i"><use href="#i-download" /></svg
+          ><span data-en="Install app">ثبّت التطبيق</span>
+        </button>
+      </footer>
+    </div>
+    <dialog id="vehicle-dialog" aria-labelledby="vehicle-dialog-title">
+      <form id="vehicle-form">
+        <div class="dialog-heading">
+          <h2 id="vehicle-dialog-title" data-en="Vehicle details">تفاصيل السيارة</h2>
+          <button
+            type="button"
+            class="icon-button"
+            data-close
+            aria-label="إغلاق"
+            data-en-aria="Close"
+          >
+            <svg class="i"><use href="#i-x" /></svg>
+          </button>
+        </div>
+        <div class="field">
+          <label for="vehicle-name" data-en="Vehicle name">اسم السيارة</label
+          ><input
+            id="vehicle-name"
+            required
+            maxlength="40"
+            placeholder="مثلاً: سيارتي اليومية"
+            data-en-placeholder="e.g. My daily driver"
+          />
+        </div>
+        <div class="two-fields">
+          <div class="field">
+            <label for="vehicle-efficiency" data-en="Efficiency (km/L)">الكفاءة (كم/لتر)</label
+            ><input
+              id="vehicle-efficiency"
+              type="text"
+              inputmode="decimal"
+              required
+              maxlength="18"
+            />
+          </div>
+          <div class="field">
+            <label for="vehicle-price" data-en="Price per liter">سعر اللتر</label
+            ><input id="vehicle-price" type="text" inputmode="decimal" required maxlength="18" />
           </div>
         </div>
-        <div class="route-end">الوصول</div>
-      </div>
-    </section>
-
-    <div class="section-head"><h2>تفاصيل الرحلة</h2><span class="minor">الحساب مباشر ✦</span></div>
-    <section class="panel intro" aria-label="مدخلات الحاسبة">
-      <div class="field distance-row">
-        <label for="distance">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a4 4 0 0 0 0-8h-6a4 4 0 0 1 0-8h7"/></svg>
-          مسافة المشوار
-        </label>
-        <div class="inputbox"><input id="distance" type="text" inputmode="decimal" autocomplete="off" value="20" aria-describedby="error-distance" aria-label="مسافة المشوار بالكيلومتر"><span class="unit">كم</span></div>
-        <div id="error-distance" class="field-error" role="status"></div>
-        <div class="quick" aria-label="مسافات سريعة">
-          <button type="button" data-distance="5" aria-pressed="false">5 كم</button>
-          <button type="button" data-distance="10" aria-pressed="false">10 كم</button>
-          <button type="button" data-distance="20" aria-pressed="true" class="selected">20 كم</button>
-          <button type="button" data-distance="50" aria-pressed="false">50 كم</button>
+        <div class="two-fields">
+          <div class="field">
+            <label for="vehicle-fuel" data-en="Fuel">الوقود</label
+            ><select id="vehicle-fuel">
+              <option value="gasoline" data-en="Gasoline">بنزين</option>
+              <option value="diesel" data-en="Diesel">مازوت</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="vehicle-currency" data-en="Currency">العملة</label
+            ><select id="vehicle-currency">
+              <option value="ل.س">ل.س · SYP</option>
+              <option value="$">$ · USD</option>
+              <option value="€">€ · EUR</option>
+              <option value="₺">₺ · TRY</option>
+            </select>
+          </div>
         </div>
+        <p id="vehicle-error" class="field-error" role="alert"></p>
+        <button type="submit" class="button primary full" data-en="Save vehicle">
+          حفظ السيارة
+        </button>
+      </form>
+    </dialog>
+    <dialog id="settings-dialog" aria-labelledby="settings-title">
+      <div class="dialog-heading">
+        <h2 id="settings-title" data-en="Make it yours">على راحتك.</h2>
+        <button class="icon-button" data-close aria-label="إغلاق" data-en-aria="Close">
+          <svg class="i"><use href="#i-x" /></svg>
+        </button>
       </div>
-      <div class="input-grid">
-        <div class="field">
-          <label for="efficiency">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v15M3 10h12M6 7h6M15 8h2l3 3v7a2 2 0 1 0 4 0v-5l-4-4M2 21h15"/></svg>
-            كفاءة السيارة
-          </label>
-          <div class="inputbox"><input id="efficiency" type="text" inputmode="decimal" autocomplete="off" value="12" aria-describedby="error-efficiency" aria-label="الكيلومترات لكل لتر"><span class="unit">كم/لتر</span></div>
-          <div id="error-efficiency" class="field-error" role="status"></div>
+      <div class="settings-group">
+        <h3 data-en="Your data">بياناتك</h3>
+        <p
+          data-en="Saved in this browser only. Export a backup before changing devices or clearing browser data."
+        >
+          محفوظة في هذا المتصفح فقط. صدّر نسخة قبل تغيير الجهاز أو مسح بيانات المتصفح.
+        </p>
+        <button id="export-backup" class="button secondary full">
+          <svg class="i"><use href="#i-download" /></svg
+          ><span data-en="Download JSON backup">تنزيل نسخة احتياطية JSON</span></button
+        ><label class="button secondary full import-label"
+          ><span data-en="Restore a backup">استعادة نسخة احتياطية</span
+          ><input
+            type="file"
+            id="import-backup"
+            accept=".json,application/json"
+            aria-label="استعادة نسخة احتياطية"
+            data-en-aria="Restore a backup"
+        /></label>
+        <div id="import-preview" hidden>
+          <p id="import-description"></p>
+          <button
+            id="confirm-import"
+            class="button primary full"
+            data-en="Replace current data with this backup"
+          >
+            استبدال البيانات الحالية بهذه النسخة
+          </button>
         </div>
-        <div class="field">
-          <label for="price">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 6.5A5 5 0 0 0 12 4H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7h-3a5 5 0 0 1-4.5-2.5"/></svg>
-            سعر اللتر
-          </label>
-          <div class="inputbox"><input id="price" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-describedby="error-price" aria-label="سعر لتر البنزين"><span class="unit">/ لتر</span></div>
-          <div id="error-price" class="field-error" role="status"></div>
-        </div>
+        <p id="import-message" role="status"></p>
       </div>
-      <div class="currency-line">
-        <span class="name">العملة</span>
-        <div class="currencies" role="group" aria-label="اختيار العملة">
-          <button type="button" data-currency="ل.س" aria-pressed="true">ل.س</button>
-          <button type="button" data-currency="$" aria-pressed="false">$</button>
-          <button type="button" data-currency="€" aria-pressed="false">€</button>
-          <button type="button" data-currency="₺" aria-pressed="false">₺</button>
-        </div>
+      <div class="settings-group">
+        <h3 data-en="Updates">التحديثات</h3>
+        <p
+          data-en="Updates keep your saved data. A ready update will ask before reloading your trip."
+        >
+          التحديث يحافظ على بياناتك. سنعرض تنبيهاً قبل إعادة تحميل رحلتك.
+        </p>
+        <button id="check-update" class="button secondary full" data-en="Check for updates">
+          تحقق من التحديثات
+        </button>
       </div>
-    </section>
-
-
-    <details class="map-panel intro" id="map-section">
-      <summary class="map-summary"><span class="map-summary-icon" aria-hidden="true">▣</span><span><strong>احسب المسافة على الخريطة</strong><small>حدد الانطلاق والوجهة لتحسب الطريق الحقيقي</small></span><span class="map-chevron" aria-hidden="true">⌄</span></summary>
-      <div class="map-panel-body">
-        <div class="map-input-group">
-          <label for="map-start-input">من وين؟ <span class="map-dot map-dot-start" aria-hidden="true"></span></label>
-          <div class="map-entry"><input id="map-start-input" type="search" placeholder="مثلاً: دمشق، المزة" autocomplete="off" enterkeyhint="search"><button id="map-start-search" type="button">بحث</button></div>
-          <div id="map-start-results" class="map-search-results" aria-label="نتائج بحث الانطلاق"></div>
-        </div>
-        <div class="map-middle-actions"><button id="map-gps" type="button">⌖ استخدم موقعي الحالي</button><button id="map-swap" type="button" title="تبديل الاتجاه">⇅ تبديل الاتجاه</button></div>
-        <div class="map-input-group">
-          <label for="map-end-input">لوين؟ <span class="map-dot map-dot-end" aria-hidden="true"></span></label>
-          <div class="map-entry"><input id="map-end-input" type="search" placeholder="مثلاً: حمص، سوريا" autocomplete="off" enterkeyhint="search"><button id="map-end-search" type="button">بحث</button></div>
-          <div id="map-end-results" class="map-search-results" aria-label="نتائج بحث الوجهة"></div>
-        </div>
-        <div class="map-pick-row" role="group" aria-label="ما الذي تريد تحديده بالنقر على الخريطة؟"><span>اضغط على الخريطة لتحديد:</span><button data-map-pick="start" type="button" aria-pressed="false">الانطلاق</button><button data-map-pick="end" type="button" aria-pressed="true">الوجهة</button></div>
-        <div id="road-map" class="road-map" role="region" aria-label="خريطة تفاعلية لتحديد مواقع الرحلة"></div>
-        <button id="map-route-button" type="button" class="action primary map-calculate">احسب الطريق</button>
-        <div id="map-result" class="map-result" hidden><strong id="map-result-title">مسافة الطريق باتجاه واحد</strong><div class="map-stats"><div><span>المسافة</span><b id="map-km" dir="ltr">—</b></div><div><span>الوقت المتوقع</span><b id="map-duration">—</b></div></div></div>
-        <p id="map-status" class="map-status" role="status" aria-live="polite">الخريطة والبحث يحتاجان اتصالاً بالإنترنت. الحاسبة اليدوية تعمل أوفلاين.</p>
-        <p class="map-privacy">لا نطلب GPS إلا عند ضغط «استخدم موقعي». يتم إرسال عبارة البحث لخدمتي Nominatim أو Photon عند البحث فقط، وإحداثيات الرحلة إلى OSRM عند الحساب. نتائج البحث من OpenStreetMap، وقد تختلف دقتها. الخرائط من OpenStreetMap. آخر مسافة والمدة فقط محفوظتان محلياً دون إحداثيات.</p>
+      <div class="settings-group">
+        <h3 data-en="About your estimates">عن الأرقام</h3>
+        <p
+          data-en="Prices are entered by you. Road distances come from OSRM / OpenStreetMap; availability, road conditions and traffic are not verified. A return trip doubles the outbound distance. Manual distances are never presented as road routing."
+        >
+          أنت تحدد الأسعار. المسافات من OSRM / OpenStreetMap؛ لا نتحقق من صلاحية الطرق أو ظروفها أو
+          المرور. العودة تضاعف مسافة الذهاب. المسافة اليدوية لا تُعرض كمسار محسوب.
+        </p>
       </div>
-    </details>
-
-    <label class="toggle-area intro" for="roundtrip">
-      <div class="toggle-copy">
-        <div class="toggle-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h14l-3-3m3 3-3 3M20 17H6l3 3m-3-3 3-3"/></svg>
-        </div>
-        <div><strong>احسب الذهاب والرجعة</strong><small>تضاعف المسافة تلقائياً</small></div>
+      <p class="field-note">
+        Road Cost 4.0 ·
+        <a
+          href="https://github.com/amerkallajo/taxi-fuel-calculator"
+          target="_blank"
+          rel="noopener"
+          data-en="Source code"
+          >الكود المصدري</a
+        >
+      </p>
+    </dialog>
+    <dialog id="install-dialog" aria-labelledby="install-title">
+      <div class="dialog-heading">
+        <h2 id="install-title" data-en="Your road companion, one tap away">رفيق الطريق، بكبسة.</h2>
+        <button class="icon-button" data-close aria-label="إغلاق" data-en-aria="Close">
+          <svg class="i"><use href="#i-x" /></svg>
+        </button>
       </div>
-      <span class="switch"><input id="roundtrip" type="checkbox" role="switch" aria-label="حساب الذهاب والعودة"><span class="switch-track"></span></span>
-    </label>
-
-    <div class="section-head"><h2>ملخّص المشوار</h2><span class="minor">كل الأرقام لحظية</span></div>
-    <section class="results-grid intro" aria-label="ملخص استهلاك البنزين">
-      <div class="metric">
-        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v14M4 10h11M17 9h2l2 3v6a2 2 0 0 1-4 0v-5M3 20h14"/></svg></div>
-        <span class="title">البنزين المستهلك</span><strong class="number" id="consumption">—</strong>
-      </div>
-      <div class="metric">
-        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h3l4-11 4 11 3-7 4 7M3 21h18"/></svg></div>
-        <span class="title">المسافة الكلية</span><strong class="number" id="distance-total">—</strong>
-      </div>
-      <div class="metric">
-        <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10m3-7a3 3 0 0 0-3-2h-1a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-1a3 3 0 0 1-3-2"/></svg></div>
-        <span class="title">تكلفة الكيلومتر</span><strong class="number" id="per-km">—</strong>
-      </div>
-    </section>
-
-    <div class="actions">
-      <button type="button" class="action primary" id="copy" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
-        نسخ نتيجة المشوار
+      <p
+        data-en="iPhone / iPad: open in Safari → Share → Add to Home Screen. Open once online, then try airplane mode."
+      >
+        iPhone / iPad: افتح في Safari ← مشاركة ← إضافة إلى الشاشة الرئيسية. افتحه مرة بوجود
+        الإنترنت، ثم جرّب وضع الطيران.
+      </p>
+      <p
+        data-en="Android / desktop Chrome: use Install app in the browser menu. Your calculator, vehicles and journal work offline after a successful first load."
+      >
+        Android / Chrome: اختر تثبيت التطبيق من قائمة المتصفح. الحاسبة والسيارات والسجل تعمل دون
+        إنترنت بعد أول تحميل ناجح.
+      </p>
+      <button id="install-native" class="button primary full" hidden data-en="Install now">
+        تثبيت الآن
       </button>
-      <button type="button" class="action secondary" id="reset">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>
-        تصفير
-      </button>
-    </div>
-    <footer>
-      النتيجة تشمل البنزين فقط، بدون الزيت والصيانة واستهلاك السيارة.<br>
-      إعدادات سيارتك محفوظة محلياً على جهازك.
-      <div class="version">ROAD COST · DARK EDITION 3.0</div>
-    </footer>
-  </main>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script defer src="./app.js?v=5"></script>
-  <script defer src="./map.js?v=9"></script>
-</body>
+      <p class="field-note" data-en="Maps and new routes still need internet.">
+        الخرائط والمسارات الجديدة تحتاج إنترنت.
+      </p>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <noscript
+      ><div class="notice">
+        يحتاج Road Cost إلى JavaScript للحساب. Please enable JavaScript.
+      </div></noscript
+    >
+    <script defer src="./core.js?v=10"></script>
+    <script defer src="./app.js?v=10"></script>
+    <script defer src="./map.js?v=10"></script>
+  </body>
 </html>

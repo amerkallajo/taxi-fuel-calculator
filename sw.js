@@ -1,68 +1,68 @@
-/* RoadCost v9 — offline cache, versioned assets, iOS + Android */
-const CACHE_NAME = 'road-cost-offline-v9';
-const CACHE_PREFIX = 'road-cost-offline-';
-const OLD_CACHE_PREFIX = 'taxi-fuel-offline-';
+/* Road Cost 4. Explicit app-shell cache; APIs and map tiles never enter it. */
+const CACHE_NAME = 'road-cost-offline-v10';
 const URLS = [
   './',
   './index.html',
-  './styles.css?v=7',
-  './map.js?v=9',
-  './app.js?v=5',
-  './manifest.webmanifest?v=6',
+  './styles.css?v=10',
+  './core.js?v=10',
+  './app.js?v=10',
+  './map.js?v=10',
+  './manifest.webmanifest?v=10',
+  './fonts/alexandria.woff2',
   './icons/road-cost.svg?v=5',
   './icons/road-cost-180.png?v=6',
   './icons/road-cost-192.png?v=6',
-  './icons/road-cost-512.png?v=6'
+  './icons/road-cost-512.png?v=6',
+  './vendor/leaflet.css',
+  './vendor/leaflet.js',
+  './vendor/images/layers.png',
+  './vendor/images/layers-2x.png',
 ];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(URLS.map(path => new URL(path, self.registration.scope).toString())))
-      .then(() => self.skipWaiting())
-  );
+const absolute = (path) => new URL(path, self.registration.scope).href;
+const SHELL = new Set(URLS.map(absolute));
+self.addEventListener('install', (event) => {
+  // A partial shell must never replace the last working installation.
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll([...SHELL])));
 });
-
-self.addEventListener('activate', event => {
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then(names => Promise.all(names
-        .filter(name => (name.startsWith(CACHE_PREFIX) || name.startsWith(OLD_CACHE_PREFIX)) && name !== CACHE_NAME)
-        .map(name => caches.delete(name))))
+    caches
+      .keys()
+      .then((names) =>
+        Promise.all(
+          names
+            .filter(
+              (name) =>
+                (name.startsWith('road-cost-offline-') || name.startsWith('taxi-fuel-offline-')) &&
+                name !== CACHE_NAME
+            )
+            .map((name) => caches.delete(name))
+        )
+      )
       .then(() => self.clients.claim())
   );
 });
-
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin || !url.pathname.startsWith(new URL(self.registration.scope).pathname)) return;
-
+  const url = new URL(request.url),
+    scope = new URL(self.registration.scope);
+  if (url.origin !== scope.origin || !url.pathname.startsWith(scope.pathname)) return;
   if (request.mode === 'navigate') {
+    // Serve the matching installed shell atomically; reg.update() checks for releases.
+    // Query strings (old ?fresh= links) cannot create unbounded cache entries.
     event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, clone)).catch(() => {}));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request).then(hit =>
-          hit || caches.match(new URL('./index.html', self.registration.scope).toString())
-        ))
+      caches
+        .open(CACHE_NAME)
+        .then(async (cache) => (await cache.match(absolute('./index.html'))) || fetch(request))
     );
     return;
   }
-
+  if (!SHELL.has(url.href)) return;
   event.respondWith(
-    caches.match(request).then(hit => hit || fetch(request).then(response => {
-      if (response.ok) {
-        const clone = response.clone();
-        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(request, clone)).catch(() => {}));
-      }
-      return response;
-    }))
+    caches.open(CACHE_NAME).then(async (cache) => (await cache.match(request)) || fetch(request))
   );
 });
