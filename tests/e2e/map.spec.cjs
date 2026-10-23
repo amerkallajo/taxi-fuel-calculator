@@ -66,6 +66,7 @@ test('real local Leaflet + mocked GPS, Arabic selection and road routing; manual
   await page.locator('#map-route-button').click();
   await expect(page.locator('#distance')).toHaveValue('20');
   await page.locator('#map-end-results button').click();
+  await expect(page.locator('#map-end-results button')).toHaveCount(0);
   await page.locator('#map-route-button').click();
   await expect(page.locator('#distance')).toHaveValue('150.00');
   await expect(page.locator('#cost-number')).toHaveText('180,000');

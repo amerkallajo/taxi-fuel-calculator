@@ -12,8 +12,11 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
       !!process.env.LIVE_URL,
     'Local Chromium lifecycle test'
   );
-  let version = 10;
   const root = path.resolve(__dirname, '../..');
+  const currentVersion = Number(
+    fs.readFileSync(path.join(root, 'sw.js'), 'utf8').match(/road-cost-offline-v(\d+)/)[1]
+  );
+  let version = currentVersion;
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const filename = path.join(root, pathname === '/' ? 'index.html' : pathname);
@@ -37,7 +40,9 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
       });
       res.end(
         pathname === '/sw.js'
-          ? buffer.toString().replaceAll('road-cost-offline-v10', 'road-cost-offline-v' + version)
+          ? buffer
+              .toString()
+              .replaceAll('road-cost-offline-v' + currentVersion, 'road-cost-offline-v' + version)
           : buffer
       );
     });
@@ -51,7 +56,7 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
     await page.locator('#distance').fill('42');
     await page.locator('#trip-name').fill('تبقى بعد التحديث');
     await page.locator('#save-trip').click();
-    version = 11;
+    version = currentVersion + 1;
     await page.evaluate(async () => {
       const r = await navigator.serviceWorker.getRegistration();
       await r.update();
@@ -68,7 +73,10 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
     await reload;
     await expect
       .poll(() =>
-        page.evaluate(async () => (await caches.keys()).includes('road-cost-offline-v11'))
+        page.evaluate(
+          async (v) => (await caches.keys()).includes('road-cost-offline-v' + v),
+          version
+        )
       )
       .toBe(true);
     await expect(page.locator('#distance')).toHaveValue('42');
@@ -77,7 +85,10 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
     await page.locator('[data-view=journal]').click();
     await expect(page.locator('#history-list')).toContainText('تبقى بعد التحديث');
     expect(
-      await page.evaluate(async () => (await caches.keys()).includes('road-cost-offline-v10'))
+      await page.evaluate(
+        async (v) => (await caches.keys()).includes('road-cost-offline-v' + v),
+        currentVersion
+      )
     ).toBe(false);
   } finally {
     await new Promise((r) => server.close(r));

@@ -43,7 +43,7 @@
 }
 html {
   min-height: 100%;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 body {
   margin: 0;
@@ -421,6 +421,7 @@ h1 {
   min-width: 0;
 }
 .card {
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -664,7 +665,7 @@ input[type='checkbox'] {
 }
 .two-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
   margin: 18px 0;
 }
@@ -2049,7 +2050,7 @@ dialog form > .field {
     display: none;
   }
   .trip-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 18px;
   }
   .trip-inputs,

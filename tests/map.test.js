@@ -327,10 +327,10 @@ async function main() {
   assert.equal(JSON.parse(saved.get('taxi-fuel-offline-v1')).price, '12000');
   const sw = fs.readFileSync('sw.js', 'utf8');
   const html = fs.readFileSync('index.html', 'utf8');
-  assert.ok(sw.includes('road-cost-offline-v10'));
-  assert.ok(sw.includes("'./map.js?v=10'"));
-  assert.ok(html.includes('<script defer src="./app.js?v=10"></script>'));
-  assert.ok(html.includes('<script defer src="./map.js?v=10"></script>'));
+  assert.ok(sw.includes('road-cost-offline-v11'));
+  assert.ok(sw.includes("'./map.js?v=11'"));
+  assert.ok(html.includes('<script defer src="./app.js?v=11"></script>'));
+  assert.ok(html.includes('<script defer src="./map.js?v=11"></script>'));
   assert.ok(html.includes('icons/road-cost-180.png?v=6'));
   console.log(
     'PASS: Damascus/Homs/Umayyad Arabic search, explicit result selection, GPS, OSRM, provider outage with map click, cost, round trip, NoRoute, offline manual, PWA cache, saved settings'

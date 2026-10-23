@@ -27,7 +27,8 @@ test('real Chromium worker caches the shell and supports offline reload and jour
   await page.locator('#open-map').click();
   await expect(page.locator('#map-status')).toContainText('إنترنت');
   const urls = await page.evaluate(async () => {
-    const c = await caches.open('road-cost-offline-v10');
+    const name = (await caches.keys()).find((x) => x.startsWith('road-cost-offline-v'));
+    const c = await caches.open(name);
     return (await c.keys()).map((x) => x.url);
   });
   expect(urls.length).toBeLessThan(25);

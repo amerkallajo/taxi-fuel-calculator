@@ -1,13 +1,13 @@
 /* Road Cost 4. Explicit app-shell cache; APIs and map tiles never enter it. */
-const CACHE_NAME = 'road-cost-offline-v10';
+const CACHE_NAME = 'road-cost-offline-v11';
 const URLS = [
   './',
   './index.html',
-  './styles.css?v=10',
-  './core.js?v=10',
-  './app.js?v=10',
-  './map.js?v=10',
-  './manifest.webmanifest?v=10',
+  './styles.css?v=11',
+  './core.js?v=11',
+  './app.js?v=11',
+  './map.js?v=11',
+  './manifest.webmanifest?v=11',
   './fonts/alexandria.woff2',
   './icons/road-cost.svg?v=5',
   './icons/road-cost-180.png?v=6',

@@ -326,7 +326,7 @@
     update();
     location.hash = 'trip';
     $('distance').focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
   function renderFavorites() {
     const favorites = state.trips.filter((x) => x.favorite).slice(0, 4);
@@ -868,7 +868,7 @@
     );
     $('open-map').addEventListener('click', () => {
       $('map-section').open = true;
-      $('map-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('map-section').scrollIntoView({ behavior: 'auto', block: 'start' });
     });
     $('show-summary').addEventListener('click', () =>
       document.querySelector('.estimate-card').scrollIntoView({

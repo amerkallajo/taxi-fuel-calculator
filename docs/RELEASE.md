@@ -30,6 +30,7 @@ Road Cost is now a private road companion: plan a trip, keep the vehicles you ac
 - Kept the original storage key and migrated by copying. Corruption recovery and storage-full messages. No silent deletion when the journal reaches capacity. Session draft survives reload and accepted updates.
 - Local Arabic variable font, locally hosted Leaflet and licenses, reduced-motion support, focus styles, native accessible dialogs, keyboard navigation and meaningful empty/error states.
 - Map errors preserve manual calculation; GPS is requested only by pressing its button. No straight-line fallback. A pending road response cannot replace a newer manual distance. External map calls remain outside the worker cache.
+- Narrow grids can shrink with different operating-system fonts. Opening maps and changing views use immediate scrolling so a moving viewport cannot swallow a search-result tap in WebKit. Browser CI is pinned to Ubuntu 24.04 to match the locked Playwright version; the app shell is cache v11.
 
 ## Verification
 

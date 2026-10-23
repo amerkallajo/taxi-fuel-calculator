@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
+const currentCache = fs.readFileSync('sw.js', 'utf8').match(/road-cost-offline-v\d+/)[0];
 function worker() {
   const handlers = {},
     calls = { skip: 0, claimed: 0, deleted: [], fetch: [] },
@@ -25,7 +26,7 @@ function worker() {
       'road-cost-offline-v9',
       'taxi-fuel-offline-v1',
       'unrelated-app',
-      'road-cost-offline-v10',
+      currentCache,
     ],
     delete: async (n) => calls.deleted.push(n),
   };

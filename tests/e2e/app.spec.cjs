@@ -148,13 +148,20 @@ test('English LTR, dark mode, navigation and mobile widths have no horizontal ov
     await page.setViewportSize({ width, height: 900 });
     for (const view of ['trip', 'garage', 'journal']) {
       await page.locator('[data-view="' + view + '"]').click();
+      const bounds = await page.evaluate(() => ({
+        viewport: innerWidth,
+        content: document.documentElement.scrollWidth,
+      }));
       expect(
-        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
-        view + ' at ' + width
-      ).toBe(true);
+        bounds.content,
+        view + ' at ' + width + ': ' + JSON.stringify(bounds)
+      ).toBeLessThanOrEqual(bounds.viewport);
     }
   }
   await page.locator('[data-view="trip"]').click();
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.addStyleTag({ content: ':root { font-family: monospace; }' });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await page.locator('#language').click();
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 });
