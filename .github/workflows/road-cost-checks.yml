@@ -19,7 +19,8 @@ jobs:
       - run: npm run check
       - run: npm test
   browsers:
-    runs-on: ubuntu-latest
+    # Keep the OS compatible with the locked Playwright/browser versions.
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
