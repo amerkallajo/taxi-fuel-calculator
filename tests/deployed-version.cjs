@@ -1,8 +1,9 @@
 /* Compare public GitHub Pages bytes with the checked-out commit after deploy.
  * Different from a CI build success: checks content served to anonymous visitors. */
-const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
 const { createHash } = require('node:crypto');
 const base = 'https://amerkallajo.github.io/taxi-fuel-calculator/';
+const revision = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const assets = [
   'index.html',
   'styles.css',
@@ -31,7 +32,8 @@ async function check() {
     });
     if (!response.ok) throw Error(path + ' HTTP ' + response.status);
     const live = Buffer.from(await response.arrayBuffer());
-    const local = fs.readFileSync(path);
+    // Compare the published Git bytes, independent of Windows checkout CRLF conversion.
+    const local = execFileSync('git', ['show', revision + ':' + path], { maxBuffer: 10 * 1024 * 1024 });
     if (hash(live) !== hash(local)) {
       throw Error(
         path +
