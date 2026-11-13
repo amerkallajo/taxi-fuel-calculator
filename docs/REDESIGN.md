@@ -1,8 +1,9 @@
-# Local layout redesign · 13 November 2026
+# Layout redesign · 13 November 2026
 
 The repository was cloned from `amerkallajo/taxi-fuel-calculator`, starting at
-`64695b2`, into the local `taxi-fuel-calculator` directory. Work is on
-`codex/welcome-service-layout`. This redesign has not been published.
+`64695b2`, into the local `taxi-fuel-calculator` directory. Changes were prepared on
+`codex/welcome-service-layout`. Publication is checked separately through the
+GitHub Pages deployment and verification of the public assets against the commit.
 
 ## Findings and decisions
 
@@ -92,3 +93,8 @@ welcome tests exercise the actual welcome-to-service-to-calculator journey.
 The final shell identifier and new UI file URLs were advanced to version 16 so
 an earlier local preview can update. Shell consistency was rechecked with the
 unit suite after that version-only change.
+
+Before publication, the unit suite also detected an intentionally inverted unit
+validation condition in a disposable copy. The original source was unchanged.
+The deployed-asset check includes the new stylesheet and both welcome images,
+alongside the calculator, finance modules and existing core assets.
