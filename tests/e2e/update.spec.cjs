@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const http = require('node:http'),
   fs = require('node:fs'),
   path = require('node:path');
-test('a waiting worker activates only on acceptance and keeps the current draft and saved data', async ({
+test('a complete update automatically replaces the stale installed shell and keeps saved data', async ({
   page,
   browserName,
 }, info) => {
@@ -57,19 +57,12 @@ test('a waiting worker activates only on acceptance and keeps the current draft 
     await page.locator('#trip-name').fill('تبقى بعد التحديث');
     await page.locator('#save-trip').click();
     version = currentVersion + 1;
-    await page.evaluate(async () => {
-      const r = await navigator.serviceWorker.getRegistration();
-      await r.update();
-    });
-    await expect
-      .poll(() =>
-        page.evaluate(async () => !!(await navigator.serviceWorker.getRegistration()).waiting)
-      )
-      .toBe(true);
-    await expect(page.locator('#update-banner')).toBeVisible();
-    await expect(page.locator('#distance')).toHaveValue('42');
+    // An old v11/v12 client is controlled by a cache-first worker and must
+    // refresh without requiring the user to discover the old update banner.
     const reload = page.waitForEvent('domcontentloaded');
-    await page.locator('#apply-update').click();
+    await page.evaluate(() => {
+      navigator.serviceWorker.getRegistration().then((registration) => registration.update());
+    });
     await reload;
     await expect
       .poll(() =>
