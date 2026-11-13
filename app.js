@@ -115,9 +115,9 @@
       $('save-favorite').checked = d.favorite === true;
       if (C.currencies.includes(d.currency)) state.settings.currency = d.currency;
       state.settings.fuel = d.fuel === 'diesel' ? 'diesel' : 'gasoline';
-      currentUnit = d.unit === 'l100' ? 'l100' : 'kml';
+      currentUnit = C.efficiencyUnits.includes(d.unit) ? d.unit : 'kml';
       const n = C.number($('efficiency').value);
-      canonicalEfficiency = currentUnit === 'l100' ? 100 / n : n;
+      canonicalEfficiency = C.efficiencyToKml(n, currentUnit);
     } catch {
       /* Invalid drafts never affect durable history. */
     }
@@ -158,14 +158,14 @@
   }
   function readEfficiency() {
     const v = C.number($('efficiency').value);
-    canonicalEfficiency = currentUnit === 'l100' ? 100 / v : v;
+    canonicalEfficiency = C.efficiencyToKml(v, currentUnit);
   }
   function update({ read = false, save = true } = {}) {
     if (read) readEfficiency();
     const i = inputValues();
     fieldError('distance', C.number(i.distance), 0.01, C.limits.distance);
-    const efficiencyMin = currentUnit === 'l100' ? 0.1 : 0.01,
-      efficiencyMax = currentUnit === 'l100' ? 10000 : 1000;
+    const efficiencyMin = currentUnit === 'l100' ? 0.1 : currentUnit === 'kmtank' ? 0.2 : 0.01,
+      efficiencyMax = currentUnit === 'l100' ? 10000 : currentUnit === 'kmtank' ? 20000 : 1000;
     fieldError('efficiency', C.number($('efficiency').value), efficiencyMin, efficiencyMax);
     fieldError('price', C.number(i.price), 0, C.limits.price);
     fieldError('passengers', C.number(i.passengers), 1, 50, true);
@@ -181,6 +181,23 @@
       canonicalEfficiency >= 0.01 &&
       canonicalEfficiency <= 1000;
     current = fieldsValid ? C.calculate(i) : null;
+    const efficiencyValid =
+      Number.isFinite(rawEfficiency) &&
+      rawEfficiency >= efficiencyMin &&
+      rawEfficiency <= efficiencyMax;
+    setMetric(
+      'tank-range',
+      efficiencyValid ? canonicalEfficiency * C.TANK_LITERS : null,
+      kmLabel()
+    );
+    const tankPrice = C.number(i.price);
+    setMetric(
+      'tank-cost',
+      Number.isFinite(tankPrice) && tankPrice >= 0 && tankPrice <= C.limits.price
+        ? tankPrice * C.TANK_LITERS
+        : null,
+      currencyLabel(state.settings.currency)
+    );
     const d = C.number(i.distance),
       km = Number.isFinite(d) && d > 0 && d <= C.limits.distance ? d * (i.roundtrip ? 2 : 1) : null;
     const liters =
@@ -613,7 +630,7 @@
       toast(t('تغيّرت العملة؛ صُفّرت المصاريف الإضافية.', 'Currency changed; extra costs reset.'));
     }
     canonicalEfficiency = v.efficiency;
-    $('efficiency').value = String(currentUnit === 'l100' ? 100 / v.efficiency : v.efficiency);
+    $('efficiency').value = String(C.efficiencyFromKml(v.efficiency, currentUnit));
     $('price').value = String(v.price);
     state.settings.currency = v.currency;
     state.settings.fuel = v.fuel;
@@ -626,7 +643,7 @@
       state.settings.theme === 'dark' ||
       (state.settings.theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]').content = dark ? '#101929' : '#f3f6fb';
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#101929' : '#f5f7fb';
     $('theme').setAttribute('aria-pressed', String(dark));
   }
   function translateStatic() {
@@ -652,18 +669,23 @@
     $('language').setAttribute('aria-label', english ? 'التبديل للعربية' : 'Switch to English');
     $('efficiency-unit').options[0].textContent = t('كم/لتر', 'km/L');
     $('efficiency-unit').options[1].textContent = t('لتر/100كم', 'L/100km');
+    $('efficiency-unit').options[2].textContent = t('كم/تنكة', 'km/20L');
     renderVehicles();
     renderFavorites();
     renderJournal();
     update({ save: false });
     showView(false);
+    selectCalculatorPanel($('view-trip').dataset.panel);
     connectionStatus();
     window.dispatchEvent(new Event('roadcost:language'));
   }
   function showView(focus = false) {
-    const view = ['trip', 'garage', 'journal', 'finance'].includes(location.hash.slice(1))
+    const view = ['welcome', 'services', 'trip', 'garage', 'journal', 'finance'].includes(
+      location.hash.slice(1)
+    )
       ? location.hash.slice(1)
-      : 'trip';
+      : 'welcome';
+    document.body.dataset.page = view;
     document.querySelectorAll('.view').forEach((el) => (el.hidden = el.id !== 'view-' + view));
     document
       .querySelectorAll('[data-view]')
@@ -673,6 +695,8 @@
           : el.removeAttribute('aria-current')
       );
     $('page-label').textContent = {
+      welcome: t('أهلًا فيك', 'Welcome'),
+      services: t('كل الخدمات', 'All services'),
       trip: t('خطّط رحلة', 'Plan a trip'),
       garage: t('سياراتي', 'My vehicles'),
       journal: t('سجل الرحلات', 'Trip journal'),
@@ -682,9 +706,22 @@
     if (view === 'journal') renderJournal();
     if (view === 'finance') window.dispatchEvent(new Event('roadcost:finance-view'));
     if (focus) {
+      if (view === 'trip') selectCalculatorPanel('inputs');
       $('main').focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
+  }
+  function selectCalculatorPanel(panel) {
+    const result = panel === 'result';
+    $('view-trip').dataset.panel = result ? 'result' : 'inputs';
+    document.querySelectorAll('[data-calculator-panel]').forEach((button) => {
+      const selected = button.dataset.calculatorPanel === (result ? 'result' : 'inputs');
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+    $('show-summary').textContent = result
+      ? t('تعديل المدخلات', 'Edit details')
+      : t('عرض النتيجة', 'See result');
   }
   function download(filename, body, type) {
     const blob = new Blob([body], { type }),
@@ -825,9 +862,7 @@
         )
       );
     }
-    $('efficiency').value = String(
-      currentUnit === 'l100' ? 100 / canonicalEfficiency : canonicalEfficiency
-    );
+    $('efficiency').value = String(C.efficiencyFromKml(canonicalEfficiency, currentUnit));
     $('price').value = state.settings.price;
     restoreDraft();
     $('journal-month').value = monthKey(new Date());
@@ -847,9 +882,7 @@
     $('efficiency-unit').addEventListener('change', () => {
       currentUnit = $('efficiency-unit').value;
       if (Number.isFinite(canonicalEfficiency) && canonicalEfficiency > 0)
-        $('efficiency').value = String(
-          currentUnit === 'l100' ? 100 / canonicalEfficiency : canonicalEfficiency
-        );
+        $('efficiency').value = String(C.efficiencyFromKml(canonicalEfficiency, currentUnit));
       update();
     });
     $('currency').addEventListener('change', () => {
@@ -874,12 +907,34 @@
       $('map-section').open = true;
       $('map-section').scrollIntoView({ behavior: 'auto', block: 'start' });
     });
-    $('show-summary').addEventListener('click', () =>
+    document.querySelectorAll('[data-calculator-panel]').forEach((button) => {
+      button.addEventListener('click', () => selectCalculatorPanel(button.dataset.calculatorPanel));
+      button.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const panel =
+          event.key === 'Home'
+            ? 'inputs'
+            : event.key === 'End'
+              ? 'result'
+              : button.dataset.calculatorPanel === 'inputs'
+                ? 'result'
+                : 'inputs';
+        selectCalculatorPanel(panel);
+        $('calculator-' + panel + '-tab').focus();
+      });
+    });
+    $('show-summary').addEventListener('click', () => {
+      if (matchMedia('(max-width: 700px)').matches) {
+        selectCalculatorPanel($('view-trip').dataset.panel === 'result' ? 'inputs' : 'result');
+        $('trip-heading').scrollIntoView({ block: 'start' });
+        return;
+      }
       document.querySelector('.estimate-card').scrollIntoView({
         behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
         block: 'start',
-      })
-    );
+      });
+    });
     $('vehicle-select').addEventListener('change', () => useVehicle($('vehicle-select').value));
     $('save-trip').addEventListener('click', saveTrip);
     $('copy').addEventListener('click', share);
@@ -904,9 +959,12 @@
     });
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
     $('language').addEventListener('click', () => {
+      const previousScroll = window.scrollY;
       state.settings.lang = state.settings.lang === 'ar' ? 'en' : 'ar';
       translateStatic();
       persist();
+      // RTL/LTR text reflow should not move the reader away from their fields.
+      window.scrollTo({ top: previousScroll, behavior: 'instant' });
     });
     ['open-settings', 'mobile-settings'].forEach((id) =>
       $(id).addEventListener('click', () => $('settings-dialog').showModal())
@@ -1075,9 +1133,7 @@
       $('import-preview').hidden = true;
       currentUnit = state.settings.unit;
       canonicalEfficiency = C.number(state.settings.efficiency);
-      $('efficiency').value = String(
-        currentUnit === 'l100' ? 100 / canonicalEfficiency : canonicalEfficiency
-      );
+      $('efficiency').value = String(C.efficiencyFromKml(canonicalEfficiency, currentUnit));
       $('price').value = state.settings.price;
       $('journal-currency').value = state.settings.currency;
       lastSave = '';
@@ -1146,11 +1202,19 @@
       }),
       saveFinanceData: (cashHistory, expenses) => {
         try {
-          if (!Array.isArray(cashHistory) || !Array.isArray(expenses) ||
-              cashHistory.length > 500 || expenses.length > 1000) return false;
+          if (
+            !Array.isArray(cashHistory) ||
+            !Array.isArray(expenses) ||
+            cashHistory.length > 500 ||
+            expenses.length > 1000
+          )
+            return false;
           const next = C.sanitizeState({ ...state, cashHistory, expenses });
-          if (next.cashHistory.length !== cashHistory.length ||
-              next.expenses.length !== expenses.length) return false;
+          if (
+            next.cashHistory.length !== cashHistory.length ||
+            next.expenses.length !== expenses.length
+          )
+            return false;
           return persist(next);
         } catch {
           return false;

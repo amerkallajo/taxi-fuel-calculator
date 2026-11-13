@@ -3,22 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f3f6fb" />
+    <meta name="theme-color" content="#f5f7fb" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Road Cost" />
     <meta
       name="description"
       content="Road Cost – حاسبة تكاليف الطريق. خطط رحلتك، قارن سياراتك، واقسم تكاليف الوقود. حاسبة عربية خاصة تعمل دون إنترنت."
     />
-    <link rel="manifest" href="./manifest.webmanifest?v=11" />
+    <link rel="manifest" href="./manifest.webmanifest?v=15" />
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/road-cost-180.png?v=6" />
     <link rel="icon" type="image/svg+xml" href="./icons/road-cost.svg?v=5" />
     <link rel="stylesheet" href="./styles.css?v=14" />
     <link rel="stylesheet" href="./finance.css?v=12" />
+    <link rel="stylesheet" href="./experience.css?v=16" />
     <title>Road Cost – حاسبة تكاليف الطريق</title>
   </head>
-  <body>
+  <body data-page="welcome">
     <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <symbol id="i-route" viewBox="0 0 24 24">
@@ -73,7 +75,7 @@
     </svg>
     <a class="skip-link" href="#main" data-en="Skip to content">انتقل إلى المحتوى</a>
     <aside class="sidebar">
-      <a href="#trip" class="brand" aria-label="Road Cost"
+      <a href="#welcome" class="brand" aria-label="Road Cost"
         ><img src="./icons/road-cost.svg?v=5" width="44" height="44" alt="" /><span
           ><b dir="ltr">road cost<span class="brand-period">.</span></b
           ><small data-en="Every trip, accounted for.">كل مشوار، محسوب.</small></span
@@ -81,6 +83,10 @@
       >
       <div class="sidebar-label" data-en="YOUR ROAD COMPANION">رفيقك على الطريق</div>
       <nav class="navigation" aria-label="التنقل الرئيسي" data-en-aria="Main navigation">
+        <a href="#services" data-view="services" class="services-nav"
+          ><svg class="i"><use href="#i-map" /></svg
+          ><span data-en="All services">كل الخدمات</span></a
+        >
         <a href="#trip" data-view="trip" aria-current="page"
           ><svg class="i"><use href="#i-route" /></svg><span data-en="Plan a trip">خطّط رحلة</span
           ><span class="nav-dot"></span
@@ -94,7 +100,8 @@
           ><span id="trip-count" class="nav-count">0</span></a
         >
         <a href="#finance" data-view="finance">
-          <svg class="i"><use href="#i-fuel" /></svg><span data-en="Cash & expenses">المصاري والمصاريف</span>
+          <svg class="i"><use href="#i-fuel" /></svg
+          ><span data-en="Cash & expenses">المصاري والمصاريف</span>
         </a>
       </nav>
       <div class="sidebar-bottom">
@@ -115,9 +122,9 @@
     <div class="workspace">
       <header class="topbar">
         <div class="mobile-brand">
-          <img src="./icons/road-cost.svg?v=5" width="32" height="32" alt="" /><b dir="ltr"
-            >road cost.</b
-          >
+          <a href="#welcome" aria-label="Road Cost"
+            ><img src="./icons/road-cost.svg?v=5" width="32" height="32" alt="" /></a
+          ><b dir="ltr">road cost.</b>
         </div>
         <div class="breadcrumb">
           <span data-en="Your space">مساحتك</span><span>/</span><b id="page-label">خطّط رحلة</b>
@@ -151,7 +158,166 @@
       </div>
       <div id="storage-warning" class="notice warning" role="status" hidden></div>
       <main id="main" tabindex="-1">
-        <section id="view-trip" class="view" aria-labelledby="trip-heading">
+        <section id="view-welcome" class="view" aria-labelledby="welcome-heading">
+          <div class="welcome-hero">
+            <div class="welcome-copy">
+              <p class="welcome-kicker" data-en="WELCOME TO ROAD COST">أهلًا فيك على الطريق</p>
+              <h1 id="welcome-heading">
+                <span data-en="Every journey.">كل مشوار.</span><br /><span
+                  class="welcome-accent"
+                  data-en="A clearer budget."
+                  >وحسبته معك.</span
+                >
+              </h1>
+              <p
+                class="welcome-description"
+                data-en="Plan your fuel, know your costs, and set off with peace of mind. All your road tools in one place."
+              >
+                اعرف تكلفة رحلتك، احسب وقودك، وانطلق براحة بال. كل أدوات الطريق بمكان واحد.
+              </p>
+              <a id="start-calculation" href="#services" class="welcome-start"
+                ><span data-en="Start calculating">ابدأ الحساب</span
+                ><span class="direction-arrow" aria-hidden="true">←</span></a
+              >
+            </div>
+            <figure class="welcome-visual">
+              <img
+                src="./assets/welcome-road.webp"
+                width="1448"
+                height="1086"
+                alt="طريق هادئ بين أشجار الزيتون والتلال"
+                data-en-aria="A quiet road through olive trees and hills"
+                fetchpriority="high"
+              />
+            </figure>
+          </div>
+          <div class="welcome-bottom">
+            <div class="creator-card">
+              <img src="./assets/amer-kallajo.webp" width="76" height="76" alt="عامر قلاجو" />
+              <div>
+                <span class="creator-label" data-en="Made for you by"
+                  >صُنعت لتسهّل يومك، بإعداد</span
+                ><strong data-en="Amer Kallajo">عامر قلاجو</strong
+                ><span class="creator-english" dir="ltr">Amer Kallajo</span>
+              </div>
+            </div>
+            <div class="welcome-assurance">
+              <svg class="i" aria-hidden="true"><use href="#i-check" /></svg>
+              <div>
+                <strong data-en="Free. For everyone.">مجانية. للجميع.</strong>
+                <p data-en="No account or subscription. Your calculations stay on your device.">
+                  بلا حساب أو اشتراك. حساباتك تبقى على جهازك.
+                </p>
+              </div>
+            </div>
+          </div>
+          <p
+            class="welcome-privacy"
+            data-en="We do not store your calculations on the platform. Saved vehicles and records stay in your browser only. Optional map searches use external map services."
+          >
+            لا نحفظ حساباتك على المنصة. السيارات والسجلات المحفوظة تبقى في متصفحك فقط. البحث
+            الاختياري بالخريطة يستخدم خدمات خرائط خارجية.
+          </p>
+        </section>
+        <section id="view-services" class="view" hidden aria-labelledby="services-heading">
+          <div class="services-heading">
+            <a href="#welcome" class="back-welcome"
+              ><span aria-hidden="true">→</span><span data-en="Welcome">الترحيب</span></a
+            >
+            <h1 id="services-heading" data-en="What would you like to calculate?">
+              شو حابب تحسب اليوم؟
+            </h1>
+            <p data-en="Choose your tool. Everything has its place.">
+              اختار خدمتك، وخلي الباقي علينا.
+            </p>
+          </div>
+          <div class="service-grid">
+            <a href="#trip" class="service-card service-featured"
+              ><span class="service-icon"
+                ><svg class="i" aria-hidden="true"><use href="#i-route" /></svg
+              ></span>
+              <div>
+                <h2 data-en="Plan a trip">خطّط رحلة</h2>
+                <p
+                  data-en="Fuel, distance and your trip budget. Enter efficiency per liter or per 20-liter tank."
+                >
+                  الوقود والمسافة وميزانية مشوارك. احسب باللتر أو بالتنكة، 20 لتر.
+                </p>
+              </div>
+              <span class="service-link"
+                ><span data-en="Open calculator">افتح الحاسبة</span
+                ><span class="direction-arrow" aria-hidden="true">←</span></span
+              ></a
+            >
+            <a href="#finance" class="service-card"
+              ><span class="service-icon"
+                ><svg class="i" aria-hidden="true"><use href="#i-fuel" /></svg
+              ></span>
+              <div>
+                <h2 data-en="Cash & expenses">المصاري والمصاريف</h2>
+                <p data-en="Count your cash and organize fuel and vehicle expenses in one place.">
+                  عدّ المصاري ورتّب مصاريف الوقود والسيارة بمكان واحد.
+                </p>
+              </div>
+              <span class="service-link"
+                ><span data-en="Manage expenses">رتّب مصاريفك</span
+                ><span class="direction-arrow" aria-hidden="true">←</span></span
+              ></a
+            >
+            <a href="#garage" class="service-card"
+              ><span class="service-icon"
+                ><svg class="i" aria-hidden="true"><use href="#i-car" /></svg
+              ></span>
+              <div>
+                <h2 data-en="My vehicles">سياراتي</h2>
+                <p
+                  data-en="Your vehicle settings, ready to use. Compare fuel costs for the same journey."
+                >
+                  إعدادات سيارتك جاهزة كل مرة. وقارن تكلفة الوقود لنفس الرحلة.
+                </p>
+              </div>
+              <span class="service-link"
+                ><span data-en="Open garage">افتح سياراتك</span
+                ><span class="direction-arrow" aria-hidden="true">←</span></span
+              ></a
+            >
+            <a href="#journal" class="service-card"
+              ><span class="service-icon"
+                ><svg class="i" aria-hidden="true"><use href="#i-history" /></svg
+              ></span>
+              <div>
+                <h2 data-en="Trip journal">سجل الرحلات</h2>
+                <p
+                  data-en="Review saved estimates, revisit regular routes and see your monthly overview."
+                >
+                  راجع حساباتك المحفوظة ومشاويرك المعتادة، وشوف ملخص الشهر.
+                </p>
+              </div>
+              <span class="service-link"
+                ><span data-en="Open journal">افتح السجل</span
+                ><span class="direction-arrow" aria-hidden="true">←</span></span
+              ></a
+            >
+          </div>
+          <div class="services-note">
+            <svg class="i" aria-hidden="true"><use href="#i-check" /></svg>
+            <p
+              data-en="All tools are free. Saved records stay in this browser, with no account needed."
+            >
+              كل الأدوات مجانية. السجلات تُحفظ في هذا المتصفح، دون الحاجة إلى حساب.
+            </p>
+          </div>
+        </section>
+        <section
+          id="view-trip"
+          class="view"
+          data-panel="inputs"
+          hidden
+          aria-labelledby="trip-heading"
+        >
+          <a href="#services" class="service-back"
+            ><span aria-hidden="true">→</span><span data-en="All services">كل الخدمات</span></a
+          >
           <div class="page-heading">
             <div>
               <div class="eyebrow">
@@ -167,8 +333,41 @@
               <svg class="i"><use href="#i-route" /></svg><span>LET’S<br />GO PLACES.</span>
             </div>
           </div>
+          <div
+            class="calculator-tabs"
+            role="tablist"
+            aria-label="الحاسبة"
+            data-en-aria="Calculator"
+          >
+            <button
+              id="calculator-inputs-tab"
+              role="tab"
+              aria-selected="true"
+              aria-controls="trip-input-panel"
+              data-calculator-panel="inputs"
+              data-en="Trip details"
+            >
+              مدخلات الرحلة
+            </button>
+            <button
+              id="calculator-result-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="trip-result-panel"
+              tabindex="-1"
+              data-calculator-panel="result"
+              data-en="Your result"
+            >
+              نتيجة الحسبة
+            </button>
+          </div>
           <div class="trip-layout">
-            <div class="trip-inputs">
+            <div
+              id="trip-input-panel"
+              class="trip-inputs"
+              role="tabpanel"
+              aria-labelledby="calculator-inputs-tab"
+            >
               <section class="card planner" aria-labelledby="details-heading">
                 <div class="card-heading">
                   <h2 id="details-heading">
@@ -348,6 +547,7 @@
                       >
                         <option value="kml">كم/لتر</option>
                         <option value="l100">لتر/100كم</option>
+                        <option value="kmtank">كم/تنكة</option>
                       </select>
                     </div>
                     <p id="error-efficiency" class="field-error" role="status"></p>
@@ -365,6 +565,17 @@
                       /><span id="price-currency">ل.س</span>
                     </div>
                     <p id="error-price" class="field-error" role="status"></p>
+                  </div>
+                </div>
+                <div class="tank-summary" aria-live="polite">
+                  <svg class="i" aria-hidden="true"><use href="#i-fuel" /></svg>
+                  <div>
+                    <span data-en="One Syrian tank = 20 liters">التنكة السورية = 20 لتر</span
+                    ><strong id="tank-range"></strong>
+                  </div>
+                  <div class="tank-price">
+                    <span data-en="Tank fuel cost">تكلفة التنكة</span
+                    ><strong id="tank-cost"></strong>
                   </div>
                 </div>
                 <div class="fuel-currency">
@@ -445,7 +656,12 @@
                   </div>
                 </details>
               </section>
-              <section class="card favorites-card">
+              <details class="card favorites-card optional-card">
+                <summary>
+                  <svg class="i" aria-hidden="true"><use href="#i-star" /></svg
+                  ><span data-en="Your regular routes">مشاويرك المعتادة</span
+                  ><span class="chevron">⌄</span>
+                </summary>
                 <div class="card-heading">
                   <h2>
                     <svg class="i"><use href="#i-star" /></svg
@@ -454,9 +670,14 @@
                   <a href="#journal" class="text-link" data-en="View all">عرض الكل ←</a>
                 </div>
                 <div id="favorites-list"></div>
-              </section>
+              </details>
             </div>
-            <div class="trip-summary">
+            <div
+              id="trip-result-panel"
+              class="trip-summary"
+              role="tabpanel"
+              aria-labelledby="calculator-result-tab"
+            >
               <section class="estimate-card" aria-labelledby="estimate-heading">
                 <div class="estimate-top">
                   <span class="estimate-label" id="estimate-heading" data-en="YOUR TRIP BUDGET"
@@ -554,7 +775,12 @@
                   الوقود وإضافاتك فقط. لا تتضمن صيانة أو استهلاك السيارة تلقائياً.
                 </p>
               </section>
-              <section class="card commute-card">
+              <details class="card commute-card optional-card">
+                <summary>
+                  <svg class="i" aria-hidden="true"><use href="#i-history" /></svg
+                  ><span data-en="Monthly & yearly outlook">التكلفة الشهرية والسنوية</span
+                  ><span class="chevron">⌄</span>
+                </summary>
                 <div class="card-heading">
                   <h2>
                     <svg class="i"><use href="#i-history" /></svg
@@ -591,7 +817,7 @@
                 >
                   توقّع بالسعر الذي أدخلته، ولا يُضاف للسجل تلقائياً.
                 </p>
-              </section>
+              </details>
             </div>
           </div>
           <div class="page-footnote">
@@ -728,9 +954,12 @@
                 <h2 id="cash-heading" data-en="Cash counter">عدّ المصاري السورية</h2>
                 <span class="pill" data-en="SYP notes">أوراق ل.س</span>
               </div>
-              <p class="field-note" data-en="Enter the number of notes for each denomination.">اكتب عدد الأوراق من كل فئة.</p>
+              <p class="field-note" data-en="Enter the number of notes for each denomination.">
+                اكتب عدد الأوراق من كل فئة.
+              </p>
               <div class="finance-column-head" aria-hidden="true">
-                <span data-en="Note">الفئة</span><span data-en="Quantity">العدد</span><span data-en="Subtotal">القيمة</span>
+                <span data-en="Note">الفئة</span><span data-en="Quantity">العدد</span
+                ><span data-en="Subtotal">القيمة</span>
               </div>
               <div id="cash-rows" class="finance-cash-rows"></div>
               <div class="finance-total">
@@ -739,10 +968,18 @@
                 <small id="cash-notes">0 ورقة</small>
               </div>
               <div class="finance-actions">
-                <button id="cash-save" type="button" class="button primary" disabled data-en="Save with date & time">
+                <button
+                  id="cash-save"
+                  type="button"
+                  class="button primary"
+                  disabled
+                  data-en="Save with date & time"
+                >
                   حفظ المبلغ والتاريخ والساعة
                 </button>
-                <button id="cash-clear" type="button" class="button secondary" data-en="Clear">تصفير</button>
+                <button id="cash-clear" type="button" class="button secondary" data-en="Clear">
+                  تصفير
+                </button>
               </div>
               <p id="cash-message" class="field-note" role="status" aria-live="polite"></p>
             </section>
@@ -751,7 +988,10 @@
                 <h2 id="expense-heading" data-en="Record a payment">تسجيل مصروف أو دفعة</h2>
                 <span class="pill" data-en="Actual spending">مدفوع فعلياً</span>
               </div>
-              <p class="field-note" data-en="Diesel, gasoline, maintenance and other costs, saved with time.">
+              <p
+                class="field-note"
+                data-en="Diesel, gasoline, maintenance and other costs, saved with time."
+              >
                 مازوت أو بنزين أو صيانة أو أي مصروف، والتاريخ والساعة تلقائي.
               </p>
               <form id="expense-form" class="finance-form">
@@ -768,17 +1008,35 @@
                 <select id="expense-vehicle"></select>
                 <label for="expense-amount" data-en="Amount paid">المبلغ المدفوع</label>
                 <div class="finance-amount-row">
-                  <input id="expense-amount" type="text" inputmode="decimal" required
-                    autocomplete="off" placeholder="مثلاً 150,000" data-en-placeholder="e.g. 150,000" />
+                  <input
+                    id="expense-amount"
+                    type="text"
+                    inputmode="decimal"
+                    required
+                    autocomplete="off"
+                    placeholder="مثلاً 150,000"
+                    data-en-placeholder="e.g. 150,000"
+                  />
                   <select id="expense-currency" aria-label="العملة" data-en-aria="Currency">
-                    <option value="ل.س">ل.س</option><option value="$">$</option>
-                    <option value="€">€</option><option value="₺">₺</option>
+                    <option value="ل.س">ل.س</option>
+                    <option value="$">$</option>
+                    <option value="€">€</option>
+                    <option value="₺">₺</option>
                   </select>
                 </div>
                 <label for="expense-note" data-en="Note (optional)">ملاحظة (اختياري)</label>
-                <input id="expense-note" type="text" maxlength="120"
-                  placeholder="مثلاً تعبئة كاملة أو تغيير زيت" data-en-placeholder="e.g. Full tank or oil change" />
-                <button type="submit" class="button primary full" data-en="Save payment with date & time">
+                <input
+                  id="expense-note"
+                  type="text"
+                  maxlength="120"
+                  placeholder="مثلاً تعبئة كاملة أو تغيير زيت"
+                  data-en-placeholder="e.g. Full tank or oil change"
+                />
+                <button
+                  type="submit"
+                  class="button primary full"
+                  data-en="Save payment with date & time"
+                >
                   حفظ الدفعة مع التاريخ والساعة
                 </button>
                 <p id="expense-message" class="field-note" role="status" aria-live="polite"></p>
@@ -795,16 +1053,22 @@
             </section>
             <section class="card finance-panel" aria-labelledby="expense-history-heading">
               <div class="card-heading">
-                <h2 id="expense-history-heading" data-en="Payment history">سجل المصاريف والمدفوعات</h2>
-                <button id="expense-export" type="button" class="text-button" data-en="Export CSV">تصدير CSV</button>
+                <h2 id="expense-history-heading" data-en="Payment history">
+                  سجل المصاريف والمدفوعات
+                </h2>
+                <button id="expense-export" type="button" class="text-button" data-en="Export CSV">
+                  تصدير CSV
+                </button>
               </div>
               <div class="finance-filters">
                 <label for="expense-month" data-en="Month">الشهر</label>
                 <input id="expense-month" type="month" />
                 <label for="expense-filter-currency" data-en="Currency">العملة</label>
                 <select id="expense-filter-currency">
-                  <option value="ل.س">ل.س</option><option value="$">$</option>
-                  <option value="€">€</option><option value="₺">₺</option>
+                  <option value="ل.س">ل.س</option>
+                  <option value="$">$</option>
+                  <option value="€">€</option>
+                  <option value="₺">₺</option>
                 </select>
               </div>
               <div class="finance-total">
@@ -815,9 +1079,12 @@
               <div id="expense-history" class="finance-history"></div>
             </section>
           </div>
-          <p class="field-note finance-privacy"
-            data-en="Works offline and stays on this device. Financial records are in the JSON backup under Settings. Back up before changing devices.">
-            بيشتغل دون إنترنت وبيضل على هالجهاز. السجلات ضمن نسخة JSON الاحتياطية في الإعدادات؛ صدّر نسخة قبل تغيير الجهاز.
+          <p
+            class="field-note finance-privacy"
+            data-en="Works offline and stays on this device. Financial records are in the JSON backup under Settings. Back up before changing devices."
+          >
+            بيشتغل دون إنترنت وبيضل على هالجهاز. السجلات ضمن نسخة JSON الاحتياطية في الإعدادات؛ صدّر
+            نسخة قبل تغيير الجهاز.
           </p>
         </section>
       </main>
@@ -994,8 +1261,8 @@
         يحتاج Road Cost إلى JavaScript للحساب. Please enable JavaScript.
       </div></noscript
     >
-    <script defer src="./core.js?v=12"></script>
-    <script defer src="./app.js?v=13"></script>
+    <script defer src="./core.js?v=15"></script>
+    <script defer src="./app.js?v=16"></script>
     <script defer src="./map.js?v=11"></script>
     <script defer src="./finance.js?v=12"></script>
   </body>

@@ -1,5 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const C = require('../../core.js');
+const { calculatorPanel } = require('./layout.cjs');
 const legacy = { efficiency: '10', price: '12000', currency: 'ل.س' };
 test.use({ serviceWorkers: 'block' });
 test.beforeEach(async ({ page }) => {
@@ -9,7 +10,7 @@ test.beforeEach(async ({ page }) => {
       localStorage.setItem('test-seeded', '1');
     }
   }, legacy);
-  await page.goto('./');
+  await page.goto('./#trip');
 });
 test('migrate Arabic settings, calculate, switch units without rounding, split and forecast', async ({
   page,
@@ -46,13 +47,16 @@ test('migrate Arabic settings, calculate, switch units without rounding, split a
 test('save favorite, separate currencies, export CSV, reuse at current price and delete', async ({
   page,
 }) => {
+  await calculatorPanel(page, 'result');
   await page.locator('#trip-name').fill('الدوام اليومي');
   await page.locator('#save-favorite').check();
   await page.locator('#save-trip').click();
   await expect(page.locator('#save-trip')).toBeDisabled();
   await expect(page.locator('#favorites-list')).toContainText('الدوام اليومي');
+  await calculatorPanel(page, 'inputs');
   await page.locator('#currency').selectOption('$');
   await page.locator('#price').fill('1');
+  await calculatorPanel(page, 'result');
   await page.locator('#save-trip').click();
   await page.locator('[data-view="journal"]').click();
   await expect(page.locator('#journal-trips')).toHaveText('1');
@@ -67,6 +71,7 @@ test('save favorite, separate currencies, export CSV, reuse at current price and
   await page.locator('#history-list [data-load-trip]').first().click();
   await expect(page.locator('#cost-number')).toHaveText('2');
   await page.locator('#price').fill('2');
+  await page.locator('.favorites-card > summary').click();
   await page.locator('#favorites-list [data-load-trip]').first().click();
   await expect(page.locator('#cost-number')).toHaveText('4');
   await page.locator('[data-view="journal"]').click();
@@ -167,6 +172,7 @@ test('English LTR, dark mode, navigation and mobile widths have no horizontal ov
 });
 test('draft survives reload and reset keeps vehicle preferences', async ({ page }) => {
   await page.locator('#distance').fill('٤٢');
+  await calculatorPanel(page, 'result');
   await page.locator('#trip-name').fill('رحلتي');
   await page.reload();
   await expect(page.locator('#distance')).toHaveValue('٤٢');
@@ -184,6 +190,7 @@ test('unavailable storage reports failure without claiming a saved trip', async 
   });
   await page.reload();
   await expect(page.locator('#storage-warning')).toBeVisible();
+  await calculatorPanel(page, 'result');
   await page.locator('#save-trip').click();
   await expect(page.locator('#save-trip')).toBeEnabled();
   const trips = await page.evaluate(() => JSON.parse(localStorage.getItem('road-cost-v4')).trips);

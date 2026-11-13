@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { calculatorPanel } = require('./layout.cjs');
 test('real Chromium worker caches the shell and supports offline reload and journal', async ({
   page,
   context,
@@ -8,11 +9,12 @@ test('real Chromium worker caches the shell and supports offline reload and jour
     browserName !== 'chromium',
     'Service Worker lifecycle is tested in Chromium; WebKit mocked journeys are separate.'
   );
-  await page.goto('./');
+  await page.goto('./#trip');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
   await page.locator('#price').fill('12000');
   await page.locator('#efficiency').fill('10');
+  await calculatorPanel(page, 'result');
   await page.locator('#trip-name').fill('رحلة دون نت');
   await page.locator('#save-trip').click();
   await context.setOffline(true);
@@ -26,12 +28,20 @@ test('real Chromium worker caches the shell and supports offline reload and jour
   await page.locator('[data-view="trip"]').click();
   await page.locator('#open-map').click();
   await expect(page.locator('#map-status')).toContainText('إنترنت');
+  await page.goto('./');
+  await expect(page.locator('#view-welcome')).toBeVisible();
+  for (const selector of ['.creator-card img', '.welcome-visual img'])
+    expect(
+      await page.locator(selector).evaluate((img) => img.complete && img.naturalWidth > 0)
+    ).toBe(true);
+  await page.locator('#start-calculation').click();
+  await expect(page.locator('#view-services')).toBeVisible();
   const urls = await page.evaluate(async () => {
     const name = (await caches.keys()).find((x) => x.startsWith('road-cost-offline-v'));
     const c = await caches.open(name);
     return (await c.keys()).map((x) => x.url);
   });
-  expect(urls.length).toBeLessThan(25);
+  expect(urls.length).toBeLessThan(28);
   expect(
     urls.every(
       (x) => !x.includes('nominatim') && !x.includes('osrm') && !x.includes('tile.openstreetmap')

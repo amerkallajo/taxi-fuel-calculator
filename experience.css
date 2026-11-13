@@ -1,0 +1,777 @@
+/* Road Cost: a calm welcome, a service directory, then one focused workspace.
+   Soft corners: 24px hero, 18px panels, 12px controls. Existing local fonts. */
+:root {
+  --bg: #f5f7fb;
+  --text: #203657;
+  --muted: #596b85;
+  --primary: #315dcc;
+  --primary-soft: #eaf0ff;
+  --line: #dfe6f1;
+  --radius: 18px;
+}
+:root[data-theme='dark'] {
+  --bg: #101929;
+  --text: #e6edfa;
+  --muted: #adbbd1;
+  --primary: #a5bfff;
+  --primary-soft: #24395c;
+  --line: #30415c;
+}
+.topbar {
+  min-height: 72px;
+}
+.heading-stamp,
+.build-label {
+  display: none;
+}
+.service-back,
+.back-welcome {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.service-back {
+  margin: -13px 0 10px;
+}
+.service-back:hover,
+.back-welcome:hover {
+  color: var(--primary);
+}
+.page-heading {
+  margin-bottom: 22px;
+}
+.page-heading .eyebrow {
+  display: none;
+}
+.page-heading h1 {
+  margin-top: 0;
+}
+/* The public entrance has its own uncluttered shell. */
+body:is([data-page='welcome'], [data-page='services']) {
+  padding-bottom: 0;
+}
+body:is([data-page='welcome'], [data-page='services']) .sidebar {
+  display: none;
+}
+body:is([data-page='welcome'], [data-page='services']) .workspace {
+  margin-inline-start: 0;
+  min-height: 100dvh;
+}
+body:is([data-page='welcome'], [data-page='services']) .topbar {
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 32px;
+  border-bottom: 1px solid var(--line);
+}
+body:is([data-page='welcome'], [data-page='services']) .mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+body:is([data-page='welcome'], [data-page='services']) .mobile-brand img {
+  width: 38px;
+  height: 38px;
+}
+body:is([data-page='welcome'], [data-page='services']) .mobile-brand b {
+  font:
+    750 25px/1.2 'Segoe UI',
+    sans-serif;
+  letter-spacing: -1.2px;
+}
+body:is([data-page='welcome'], [data-page='services']) .breadcrumb,
+body:is([data-page='welcome'], [data-page='services']) .connection,
+body:is([data-page='welcome'], [data-page='services']) .workspace-footer {
+  display: none;
+}
+body:is([data-page='welcome'], [data-page='services']) .mobile-settings {
+  display: inline-flex;
+}
+body:is([data-page='welcome'], [data-page='services']) main {
+  max-width: 1240px;
+  padding: 48px 32px 24px;
+}
+.welcome-hero {
+  display: grid;
+  grid-template-columns: 1fr 1.04fr;
+  align-items: center;
+  gap: 72px;
+}
+.welcome-kicker {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 550;
+  margin-bottom: 15px;
+}
+.welcome-copy h1 {
+  font-size: clamp(38px, 4.1vw, 58px);
+  font-weight: 720;
+  line-height: 1.5;
+  letter-spacing: -2px;
+  margin: 0;
+}
+.welcome-accent {
+  color: var(--primary);
+}
+.welcome-description {
+  max-width: 410px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 2.2;
+  margin-top: 20px;
+}
+.welcome-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  background: var(--primary);
+  color: var(--surface);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  min-height: 56px;
+  padding: 13px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 28px;
+  white-space: nowrap;
+  box-shadow: 0 6px 14px #315dcc18;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s;
+}
+.welcome-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 20px #315dcc25;
+}
+.direction-arrow {
+  font:
+    24px/1 'Segoe UI',
+    sans-serif;
+}
+[dir='ltr'] .direction-arrow,
+[dir='ltr'] .service-back > span:first-child,
+[dir='ltr'] .back-welcome > span:first-child {
+  transform: rotate(180deg);
+}
+.welcome-visual {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  aspect-ratio: 1.2;
+  background: #d8e5f3;
+}
+.welcome-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.welcome-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1.04fr;
+  align-items: center;
+  gap: 72px;
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+  padding-top: 25px;
+}
+.creator-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+.creator-card img {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  object-position: 50% 22%;
+  border-radius: 18px;
+}
+.creator-card > div {
+  display: grid;
+  gap: 2px;
+}
+.creator-label {
+  color: var(--muted);
+  font-size: 10px;
+}
+.creator-card strong {
+  font-size: 18px;
+  font-weight: 650;
+}
+.creator-english {
+  color: var(--muted);
+  font:
+    12px/1.6 'Segoe UI',
+    sans-serif;
+  text-align: start;
+}
+.welcome-assurance {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.welcome-assurance > .i {
+  width: 36px;
+  height: 36px;
+  color: var(--primary);
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.welcome-assurance strong {
+  font-size: 14px;
+}
+.welcome-assurance p {
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 7px;
+}
+.welcome-privacy {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 2;
+  margin-top: 22px;
+  max-width: 900px;
+}
+/* Services are destinations, not a long page of forms. */
+.services-heading {
+  margin-bottom: 28px;
+}
+.services-heading h1 {
+  font-size: clamp(26px, 3vw, 36px);
+  margin: 10px 0 8px;
+}
+.services-heading > p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.service-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.service-card {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  column-gap: 20px;
+  row-gap: 21px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px;
+  transition:
+    border-color 0.18s,
+    transform 0.18s;
+}
+.service-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
+.service-featured {
+  background: var(--primary-soft);
+  border-color: #bfcef1;
+}
+.service-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: var(--soft);
+  color: var(--primary);
+}
+.service-featured .service-icon {
+  background: var(--surface);
+}
+.service-icon .i {
+  width: 27px;
+  height: 27px;
+}
+.service-card h2 {
+  font-size: 18px;
+  font-weight: 650;
+  margin-bottom: 10px;
+}
+.service-card p {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 2;
+  max-width: 390px;
+}
+.service-link {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 550;
+}
+.services-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.services-note .i {
+  color: var(--primary);
+}
+/* The estimate uses the same light/dark theme as the rest of the workspace. */
+.calculator-tabs {
+  display: none;
+}
+.estimate-card {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.estimate-label,
+.estimate-card > p#cost-hint,
+.cost-line > span,
+.estimate-metrics > div > span,
+.estimate-metrics small,
+.cost-breakdown > div,
+.split-result span,
+.favorite-label,
+.estimate-note {
+  color: var(--muted);
+}
+.cost-line strong,
+.split-result strong {
+  color: var(--primary);
+}
+.estimate-badge {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--line);
+}
+.route-illustration {
+  display: none;
+}
+.estimate-metrics {
+  border-color: var(--line);
+}
+.estimate-metrics > div + div,
+.split-result {
+  border-color: var(--line);
+}
+.save-fields > input {
+  color: var(--text);
+  background: var(--soft);
+  border-color: var(--line);
+}
+.save-fields > input::placeholder {
+  color: var(--muted);
+}
+.save-button {
+  background: var(--primary);
+  color: var(--surface);
+  border-color: var(--primary);
+}
+.share-button {
+  background: var(--soft);
+  color: var(--primary);
+  border-color: var(--line);
+}
+.optional-card {
+  padding-block: 0;
+}
+.optional-card > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 550;
+  list-style: none;
+}
+.optional-card > summary::-webkit-details-marker {
+  display: none;
+}
+.optional-card > summary .i {
+  color: var(--primary);
+  width: 19px;
+}
+.optional-card > summary .chevron {
+  margin-inline-start: auto;
+}
+.optional-card[open] {
+  padding-bottom: 22px;
+}
+.optional-card[open] > summary {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+.optional-card .card-heading {
+  display: none;
+}
+.tank-summary {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--primary-soft);
+  padding: 12px;
+  margin-bottom: 18px;
+}
+.tank-summary > .i {
+  color: var(--primary);
+}
+.tank-summary > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.tank-summary > div > span {
+  color: var(--muted);
+  font-size: 9px;
+}
+.tank-summary strong {
+  font:
+    650 19px/1.4 'Segoe UI',
+    Alexandria,
+    sans-serif;
+  color: var(--primary);
+  overflow-wrap: anywhere;
+}
+.tank-summary strong small {
+  font:
+    10px Alexandria,
+    'Segoe UI',
+    sans-serif;
+}
+.tank-price {
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 12px;
+}
+.input-with-unit select {
+  max-width: 112px;
+}
+.estimate-card,
+#map-section {
+  scroll-margin-top: 90px;
+}
+.planner .card-heading {
+  margin-bottom: 16px;
+}
+.planner .toggle-row {
+  margin-top: 10px;
+  padding-top: 5px;
+}
+.planner .divider {
+  margin-block: 15px;
+}
+.planner .two-fields {
+  margin-top: 16px;
+}
+.planner .budget-details {
+  margin-top: 14px;
+}
+.planner .map-panel {
+  margin-top: 12px;
+}
+.planner .large-input input {
+  font-size: 40px;
+  min-height: 48px;
+}
+.planner .large-input {
+  padding-bottom: 5px;
+}
+.planner .quick {
+  margin-top: 10px;
+}
+@media (min-width: 1100px) {
+  .trip-summary {
+    position: sticky;
+    top: 92px;
+  }
+}
+@media (max-width: 900px) {
+  .welcome-hero,
+  .welcome-bottom {
+    gap: 34px;
+  }
+  .welcome-copy h1 {
+    font-size: 38px;
+  }
+  .welcome-description {
+    font-size: 12px;
+  }
+  .welcome-visual {
+    aspect-ratio: 0.9;
+  }
+  .service-card {
+    padding: 22px;
+    column-gap: 14px;
+  }
+  .service-card h2 {
+    font-size: 16px;
+  }
+}
+@media (max-width: 700px) {
+  .calculator-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    background: var(--line);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .calculator-tabs button {
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    min-height: 44px;
+  }
+  .calculator-tabs button[aria-selected='true'] {
+    background: var(--surface);
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  #view-trip[data-panel='inputs'] .trip-summary,
+  #view-trip[data-panel='result'] .trip-inputs {
+    display: none;
+  }
+  #view-trip .page-heading {
+    margin-bottom: 16px;
+  }
+  #view-trip .page-heading p,
+  .planner .card-heading {
+    display: none;
+  }
+  .planner .map-panel:not([open]) {
+    display: none;
+  }
+  #vehicle-select:not(:has(option + option)) {
+    display: none;
+  }
+  #trip-heading {
+    scroll-margin-top: 90px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .topbar {
+    padding-inline: 20px;
+    min-height: 68px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .topbar .mobile-brand b {
+    font-size: 23px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .topbar .mobile-brand img {
+    width: 32px;
+    height: 32px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .top-actions {
+    gap: 6px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) main {
+    padding: 28px 22px 22px;
+  }
+  .welcome-hero {
+    grid-template-columns: 1fr;
+    gap: 27px;
+  }
+  .welcome-kicker {
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+  .welcome-copy h1 {
+    font-size: 38px;
+    line-height: 1.5;
+    letter-spacing: -1.5px;
+  }
+  .welcome-description {
+    margin-top: 11px;
+    font-size: 12px;
+    line-height: 2.1;
+    max-width: 390px;
+  }
+  .welcome-start {
+    margin-top: 20px;
+    min-height: 52px;
+    padding-inline: 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+  .welcome-visual {
+    aspect-ratio: auto;
+    height: 175px;
+    border-radius: 18px;
+  }
+  .welcome-visual img {
+    object-position: 50% 65%;
+  }
+  .welcome-bottom {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 20px;
+    margin-top: 22px;
+  }
+  .creator-card {
+    gap: 13px;
+  }
+  .creator-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+  }
+  .creator-card strong {
+    font-size: 16px;
+  }
+  .creator-label {
+    font-size: 9px;
+  }
+  .welcome-assurance strong {
+    font-size: 12px;
+  }
+  .welcome-assurance p {
+    font-size: 9px;
+    margin-top: 3px;
+  }
+  .welcome-privacy {
+    font-size: 9px;
+    margin-top: 18px;
+  }
+  .services-heading {
+    margin-bottom: 22px;
+  }
+  .services-heading h1 {
+    font-size: 25px;
+    margin-top: 7px;
+    letter-spacing: -1px;
+  }
+  .services-heading > p {
+    font-size: 11px;
+  }
+  .service-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .service-card {
+    grid-template-columns: 40px 1fr;
+    padding: 19px 16px;
+    gap: 7px 13px;
+  }
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+  .service-icon .i {
+    width: 23px;
+    height: 23px;
+  }
+  .service-card h2 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .service-card p {
+    font-size: 10px;
+    line-height: 1.9;
+  }
+  .service-link {
+    font-size: 9px;
+  }
+  .service-link .direction-arrow {
+    font-size: 21px;
+  }
+  .services-note {
+    font-size: 9px;
+    line-height: 2;
+    margin-top: 20px;
+  }
+  .navigation {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .navigation a {
+    padding-inline: 2px;
+  }
+  .navigation a > span:not(.nav-dot):not(.nav-count) {
+    font-size: 8px;
+  }
+  .service-back {
+    margin-top: -10px;
+    margin-bottom: 3px;
+  }
+  .tank-summary {
+    grid-template-columns: 20px 1fr 1fr;
+    padding: 10px;
+    gap: 8px;
+  }
+  .tank-summary > div > span {
+    font-size: 8px;
+  }
+  .tank-summary strong {
+    font-size: 18px;
+  }
+  .input-with-unit select {
+    max-width: 110px;
+  }
+  .trip-layout {
+    gap: 14px;
+  }
+  .optional-card > summary {
+    font-size: 11px;
+  }
+}
+@media (max-width: 360px) {
+  body:is([data-page='welcome'], [data-page='services']) main {
+    padding-inline: 16px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .topbar {
+    padding-inline: 14px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .mobile-brand {
+    gap: 6px;
+  }
+  body:is([data-page='welcome'], [data-page='services']) .topbar .mobile-brand b {
+    font-size: 20px;
+  }
+  .welcome-copy h1 {
+    font-size: 34px;
+  }
+  .welcome-description {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #view-welcome .welcome-copy,
+  #view-services .service-grid {
+    animation: arrive 0.4s ease-out both;
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+@media print {
+  .calculator-tabs { display: none; }
+  #view-trip .trip-inputs, #view-trip .trip-summary { display: block !important; }
+  .service-back,
+  .services-nav {
+    display: none;
+  }
+  .trip-summary {
+    position: static;
+  }
+}

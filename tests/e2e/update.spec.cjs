@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { calculatorPanel } = require('./layout.cjs');
 const http = require('node:http'),
   fs = require('node:fs'),
   path = require('node:path');
@@ -49,11 +50,12 @@ test('a complete update automatically replaces the stale installed shell and kee
   });
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   try {
-    await page.goto('http://127.0.0.1:' + server.address().port + '/');
+    await page.goto('http://127.0.0.1:' + server.address().port + '/#trip');
     await page.evaluate(() => navigator.serviceWorker.ready);
     await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
     await page.locator('#price').fill('12000');
     await page.locator('#distance').fill('42');
+    await calculatorPanel(page, 'result');
     await page.locator('#trip-name').fill('تبقى بعد التحديث');
     await page.locator('#save-trip').click();
     version = currentVersion + 1;

@@ -6,7 +6,7 @@ test('mobile header stays visible and interactive after scrolling in both main a
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('./');
+  await page.goto('./#trip');
 
   for (const view of ['trip', 'finance']) {
     await page.locator('[data-view="' + view + '"]').click();
@@ -14,10 +14,14 @@ test('mobile header stays visible and interactive after scrolling in both main a
     // for navigation to settle before simulating the user's downward swipe.
     await expect(page).toHaveURL(new RegExp('#' + view + '$'));
     await expect(page.locator('#view-' + view)).toBeVisible();
-    await expect.poll(() => page.evaluate(() => {
-      window.scrollTo({ top: 320, behavior: 'instant' });
-      return window.scrollY;
-    })).toBeGreaterThan(150);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          window.scrollTo({ top: 320, behavior: 'instant' });
+          return window.scrollY;
+        })
+      )
+      .toBeGreaterThan(150);
 
     const placement = await page.locator('.topbar').evaluate((el) => {
       const rect = el.getBoundingClientRect();

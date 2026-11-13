@@ -1,15 +1,18 @@
 /* Road Cost 4. Explicit app-shell cache; APIs and map tiles never enter it. */
-const CACHE_NAME = 'road-cost-offline-v14';
+const CACHE_NAME = 'road-cost-offline-v16';
 const URLS = [
   './',
   './index.html',
   './styles.css?v=14',
-  './core.js?v=12',
-  './app.js?v=13',
+  './core.js?v=15',
+  './app.js?v=16',
+  './experience.css?v=16',
+  './assets/welcome-road.webp',
+  './assets/amer-kallajo.webp',
   './map.js?v=11',
   './finance.css?v=12',
   './finance.js?v=12',
-  './manifest.webmanifest?v=11',
+  './manifest.webmanifest?v=15',
   './fonts/alexandria.woff2',
   './icons/road-cost.svg?v=5',
   './icons/road-cost-180.png?v=6',
@@ -27,7 +30,8 @@ self.addEventListener('install', (event) => {
   // This rescues installed clients still controlled by v11/v12: their old
   // navigation handler otherwise keeps returning the old cached index.html.
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => cache.addAll([...SHELL]))
       .then(() => self.skipWaiting())
   );

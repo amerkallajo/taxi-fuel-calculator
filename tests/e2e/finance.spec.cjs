@@ -1,8 +1,10 @@
 const { test, expect } = require('@playwright/test');
 test.use({ serviceWorkers: 'block' });
 
-test('cash and actual expenses are timestamped, saved offline, and survive reload', async ({ page }) => {
-  await page.goto('./');
+test('cash and actual expenses are timestamped, saved offline, and survive reload', async ({
+  page,
+}) => {
+  await page.goto('./#trip');
   await page.locator('[data-view="finance"]').click();
   await page.locator('#cash-note-50000').fill('٢');
   await page.locator('#cash-note-2500').fill('٣');

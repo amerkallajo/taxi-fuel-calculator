@@ -51,7 +51,7 @@ async function setup(page, { denied = false, routeCode = 'Ok', delay = 0 } = {})
       })
       .catch(() => {});
   });
-  await page.goto('./');
+  await page.goto('./#trip');
   await page.locator('#open-map').click();
   await expect(page.locator('.leaflet-container')).toBeVisible();
 }
