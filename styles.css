@@ -1990,6 +1990,11 @@ dialog form > .field {
     margin: 0;
   }
   .topbar {
+    /* Keep theme, language and settings tappable while scrolling on iOS PWA. */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
     min-height: 69px;
     padding: 12px 20px;
   }
