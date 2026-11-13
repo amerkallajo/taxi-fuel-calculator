@@ -10,6 +10,8 @@
   const currencies = ['ل.س', '$', '€', '₺'];
   const DENOMINATIONS = [50000, 20000, 10000, 5000, 2500, 1000, 500];
   const EXPENSE_TYPES = ['diesel', 'gasoline', 'maintenance', 'parking', 'toll', 'other'];
+  const TANK_LITERS = 20;
+  const efficiencyUnits = ['kml', 'l100', 'kmtank'];
   const limits = {
     distance: 1000000,
     efficiency: 1000,
@@ -33,6 +35,16 @@
   }
   function valid(n, min, max) {
     return Number.isFinite(n) && n >= min && n <= max;
+  }
+  function efficiencyToKml(value, unit) {
+    const n = number(value);
+    if (!efficiencyUnits.includes(unit) || !Number.isFinite(n) || n <= 0) return NaN;
+    return unit === 'l100' ? 100 / n : unit === 'kmtank' ? n / TANK_LITERS : n;
+  }
+  function efficiencyFromKml(value, unit) {
+    const n = number(value);
+    if (!efficiencyUnits.includes(unit) || !Number.isFinite(n) || n <= 0) return NaN;
+    return unit === 'l100' ? 100 / n : unit === 'kmtank' ? n * TANK_LITERS : n;
   }
   function calculate(input) {
     const d = number(input.distance),
@@ -197,7 +209,7 @@
     const state = defaultState(raw.settings);
     const s = raw.settings;
     state.settings.fuel = s.fuel === 'diesel' ? 'diesel' : 'gasoline';
-    state.settings.unit = s.unit === 'l100' ? 'l100' : 'kml';
+    state.settings.unit = efficiencyUnits.includes(s.unit) ? s.unit : 'kml';
     state.settings.theme = ['light', 'dark', 'system'].includes(s.theme) ? s.theme : 'system';
     state.settings.lang = s.lang === 'en' ? 'en' : 'ar';
     state.vehicles = raw.vehicles.slice(0, 20).map(cleanVehicle).filter(Boolean);
@@ -276,6 +288,10 @@
     limits,
     DENOMINATIONS,
     EXPENSE_TYPES,
+    TANK_LITERS,
+    efficiencyUnits,
+    efficiencyToKml,
+    efficiencyFromKml,
     cashTotals,
     cleanCashRecord,
     cleanExpense,

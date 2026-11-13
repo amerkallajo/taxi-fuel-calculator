@@ -2,6 +2,34 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const C = require('../core.js');
 const base = { distance: 150, efficiency: 10, price: 12000 };
+
+test('a Syrian 20-liter tank produces the same trip cost in all three efficiency units', () => {
+  assert.equal(C.TANK_LITERS, 20);
+  for (const [value, unit] of [
+    ['٢٤٠', 'kmtank'],
+    ['12', 'kml'],
+    [100 / 12, 'l100'],
+  ]) {
+    const efficiency = C.efficiencyToKml(value, unit);
+    assert.equal(efficiency, 12);
+    const result = C.calculate({ distance: 120, efficiency, price: 12000 });
+    assert.equal(result.liters, 10);
+    assert.equal(result.total, 120000);
+    assert.equal(C.efficiencyFromKml(efficiency, 'kmtank'), 240);
+  }
+  for (const value of ['', '0', '-20', 'abc', Infinity])
+    assert.ok(Number.isNaN(C.efficiencyToKml(value, 'kmtank')));
+  assert.ok(Number.isNaN(C.efficiencyFromKml(0, 'kmtank')));
+  assert.ok(Number.isNaN(C.efficiencyToKml(240, 'unknown')));
+});
+
+test('tank preferences survive backup restore without changing stored km/L efficiency', () => {
+  const state = C.defaultState({ efficiency: '12' });
+  state.settings.unit = 'kmtank';
+  const restored = C.sanitizeState(JSON.parse(JSON.stringify(state)));
+  assert.equal(restored.settings.unit, 'kmtank');
+  assert.equal(restored.settings.efficiency, '12');
+});
 test('Arabic, Persian and English digits, decimal separators and thousands', () => {
   for (const [s, n] of [
     ['١٢٬٥٠٠', 12500],
