@@ -47,10 +47,10 @@ async function install(w) {
   w.handlers.install({ waitUntil: (p) => (promise = p) });
   await promise;
 }
-test('complete shell contains existing files and no remote URLs; install waits for user', async () => {
+test('complete shell contains existing files and auto-activates only after precache succeeds', async () => {
   const w = worker();
   await install(w);
-  assert.equal(w.calls.skip, 0);
+  assert.equal(w.calls.skip, 1);
   for (const url of w.calls.precache) {
     const u = new URL(url);
     assert.equal(u.origin, 'https://example.com');
