@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./icons/road-cost-180.png?v=6" />
     <link rel="icon" type="image/svg+xml" href="./icons/road-cost.svg?v=5" />
     <link rel="stylesheet" href="./styles.css?v=11" />
+    <link rel="stylesheet" href="./finance.css?v=12" />
     <title>Road Cost – حاسبة تكاليف الطريق</title>
   </head>
   <body>
@@ -92,6 +93,9 @@
           ><span data-en="Trip journal">سجل الرحلات</span
           ><span id="trip-count" class="nav-count">0</span></a
         >
+        <a href="#finance" data-view="finance">
+          <svg class="i"><use href="#i-fuel" /></svg><span data-en="Cash & expenses">المصاري والمصاريف</span>
+        </a>
       </nav>
       <div class="sidebar-bottom">
         <div class="privacy-mark">
@@ -708,6 +712,114 @@
           </div>
           <div id="history-list" class="history-list"></div>
         </section>
+        <section id="view-finance" class="view" hidden aria-labelledby="finance-heading">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow" data-en="EVERY LIRA, ACCOUNTED FOR">كل ليرة إلها حساب</div>
+              <h1 id="finance-heading" data-en="Cash & expenses">المصاري والمصاريف</h1>
+              <p data-en="Count your cash and record actual payments with the date and time.">
+                عدّ مصاريك وسجّل شو دفعت فعلياً، مع التاريخ والساعة.
+              </p>
+            </div>
+          </div>
+          <div class="finance-grid">
+            <section class="card finance-panel" aria-labelledby="cash-heading">
+              <div class="card-heading">
+                <h2 id="cash-heading" data-en="Cash counter">عدّ المصاري السورية</h2>
+                <span class="pill" data-en="SYP notes">أوراق ل.س</span>
+              </div>
+              <p class="field-note" data-en="Enter the number of notes for each denomination.">اكتب عدد الأوراق من كل فئة.</p>
+              <div class="finance-column-head" aria-hidden="true">
+                <span data-en="Note">الفئة</span><span data-en="Quantity">العدد</span><span data-en="Subtotal">القيمة</span>
+              </div>
+              <div id="cash-rows" class="finance-cash-rows"></div>
+              <div class="finance-total">
+                <span data-en="Total cash">مجموع المصاري</span>
+                <strong id="cash-total" dir="auto">0 ل.س</strong>
+                <small id="cash-notes">0 ورقة</small>
+              </div>
+              <div class="finance-actions">
+                <button id="cash-save" type="button" class="button primary" disabled data-en="Save with date & time">
+                  حفظ المبلغ والتاريخ والساعة
+                </button>
+                <button id="cash-clear" type="button" class="button secondary" data-en="Clear">تصفير</button>
+              </div>
+              <p id="cash-message" class="field-note" role="status" aria-live="polite"></p>
+            </section>
+            <section class="card finance-panel" aria-labelledby="expense-heading">
+              <div class="card-heading">
+                <h2 id="expense-heading" data-en="Record a payment">تسجيل مصروف أو دفعة</h2>
+                <span class="pill" data-en="Actual spending">مدفوع فعلياً</span>
+              </div>
+              <p class="field-note" data-en="Diesel, gasoline, maintenance and other costs, saved with time.">
+                مازوت أو بنزين أو صيانة أو أي مصروف، والتاريخ والساعة تلقائي.
+              </p>
+              <form id="expense-form" class="finance-form">
+                <label for="expense-type" data-en="Expense type">نوع المصروف</label>
+                <select id="expense-type" required>
+                  <option value="diesel" data-en="Diesel">مازوت</option>
+                  <option value="gasoline" data-en="Gasoline">بنزين</option>
+                  <option value="maintenance" data-en="Maintenance / repair">صيانة / تصليح</option>
+                  <option value="parking" data-en="Parking">موقف سيارات</option>
+                  <option value="toll" data-en="Road fees">رسوم طريق</option>
+                  <option value="other" data-en="Other">مصروف آخر</option>
+                </select>
+                <label for="expense-vehicle" data-en="Vehicle">السيارة</label>
+                <select id="expense-vehicle"></select>
+                <label for="expense-amount" data-en="Amount paid">المبلغ المدفوع</label>
+                <div class="finance-amount-row">
+                  <input id="expense-amount" type="text" inputmode="decimal" required
+                    autocomplete="off" placeholder="مثلاً 150,000" data-en-placeholder="e.g. 150,000" />
+                  <select id="expense-currency" aria-label="العملة" data-en-aria="Currency">
+                    <option value="ل.س">ل.س</option><option value="$">$</option>
+                    <option value="€">€</option><option value="₺">₺</option>
+                  </select>
+                </div>
+                <label for="expense-note" data-en="Note (optional)">ملاحظة (اختياري)</label>
+                <input id="expense-note" type="text" maxlength="120"
+                  placeholder="مثلاً تعبئة كاملة أو تغيير زيت" data-en-placeholder="e.g. Full tank or oil change" />
+                <button type="submit" class="button primary full" data-en="Save payment with date & time">
+                  حفظ الدفعة مع التاريخ والساعة
+                </button>
+                <p id="expense-message" class="field-note" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+          </div>
+          <div class="finance-grid finance-ledgers">
+            <section class="card finance-panel" aria-labelledby="cash-history-heading">
+              <div class="card-heading">
+                <h2 id="cash-history-heading" data-en="Saved cash counts">سجل المبالغ المحفوظة</h2>
+                <span id="cash-history-count" class="pill">0</span>
+              </div>
+              <div id="cash-history" class="finance-history"></div>
+            </section>
+            <section class="card finance-panel" aria-labelledby="expense-history-heading">
+              <div class="card-heading">
+                <h2 id="expense-history-heading" data-en="Payment history">سجل المصاريف والمدفوعات</h2>
+                <button id="expense-export" type="button" class="text-button" data-en="Export CSV">تصدير CSV</button>
+              </div>
+              <div class="finance-filters">
+                <label for="expense-month" data-en="Month">الشهر</label>
+                <input id="expense-month" type="month" />
+                <label for="expense-filter-currency" data-en="Currency">العملة</label>
+                <select id="expense-filter-currency">
+                  <option value="ل.س">ل.س</option><option value="$">$</option>
+                  <option value="€">€</option><option value="₺">₺</option>
+                </select>
+              </div>
+              <div class="finance-total">
+                <span data-en="Actual spending this month">المصاريف الفعلية بهالشهر</span>
+                <strong id="expense-month-total" dir="auto">0 ل.س</strong>
+                <small id="expense-month-count">0</small>
+              </div>
+              <div id="expense-history" class="finance-history"></div>
+            </section>
+          </div>
+          <p class="field-note finance-privacy"
+            data-en="Works offline and stays on this device. Financial records are in the JSON backup under Settings. Back up before changing devices.">
+            بيشتغل دون إنترنت وبيضل على هالجهاز. السجلات ضمن نسخة JSON الاحتياطية في الإعدادات؛ صدّر نسخة قبل تغيير الجهاز.
+          </p>
+        </section>
       </main>
       <footer class="workspace-footer">
         <span>Road Cost – <span data-en="Road cost calculator">حاسبة تكاليف الطريق</span></span
@@ -882,8 +994,9 @@
         يحتاج Road Cost إلى JavaScript للحساب. Please enable JavaScript.
       </div></noscript
     >
-    <script defer src="./core.js?v=11"></script>
-    <script defer src="./app.js?v=11"></script>
+    <script defer src="./core.js?v=12"></script>
+    <script defer src="./app.js?v=12"></script>
     <script defer src="./map.js?v=11"></script>
+    <script defer src="./finance.js?v=12"></script>
   </body>
 </html>

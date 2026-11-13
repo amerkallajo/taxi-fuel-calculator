@@ -8,6 +8,8 @@
   const STORAGE_KEY = 'road-cost-v4';
   const LEGACY_KEY = 'taxi-fuel-offline-v1';
   const currencies = ['ل.س', '$', '€', '₺'];
+  const DENOMINATIONS = [50000, 20000, 10000, 5000, 2500, 1000, 500];
+  const EXPENSE_TYPES = ['diesel', 'gasoline', 'maintenance', 'parking', 'toll', 'other'];
   const limits = {
     distance: 1000000,
     efficiency: 1000,
@@ -82,6 +84,8 @@
       },
       vehicles: [],
       trips: [],
+      cashHistory: [],
+      expenses: [],
     };
   }
   function text(value, max = 80) {
@@ -136,6 +140,47 @@
       source: t.source === 'road' ? 'road' : 'manual',
     };
   }
+  function cashTotals(rawCounts) {
+    if (!rawCounts || typeof rawCounts !== 'object' || Array.isArray(rawCounts)) return null;
+    const counts = {};
+    let notes = 0;
+    let total = 0;
+    for (const denomination of DENOMINATIONS) {
+      const count = number(rawCounts[denomination] ?? 0);
+      if (!Number.isInteger(count) || count < 0 || count > 1000000) return null;
+      counts[denomination] = count;
+      notes += count;
+      total += denomination * count;
+    }
+    return notes > 0 && total <= 1e15 ? { counts, notes, total } : null;
+  }
+  function cleanCashRecord(record) {
+    const result = cashTotals(record?.counts);
+    if (!record || !text(record.id) ||
+        !valid(record.date, 0, 8640000000000000) || !result) return null;
+    return { id: text(record.id), date: record.date, ...result };
+  }
+  function cleanExpense(record) {
+    const amount = number(record?.amount);
+    if (!record || !text(record.id) ||
+        !valid(record.date, 0, 8640000000000000) ||
+        !valid(amount, 0.01, 1e12) ||
+        !currencies.includes(record.currency) ||
+        !EXPENSE_TYPES.includes(record.type)) return null;
+    return {
+      id: text(record.id), date: record.date, type: record.type,
+      amount, currency: record.currency,
+      vehicleId: text(record.vehicleId, 80),
+      vehicleName: text(record.vehicleName, 40),
+      note: text(record.note, 120),
+    };
+  }
+  function uniqueRecords(records, cleaner, limit) {
+    const cleaned = records.slice(0, limit).map(cleaner).filter(Boolean);
+    return cleaned.filter((record, index, all) =>
+      all.findIndex((other) => other.id === record.id) === index
+    );
+  }
   function sanitizeState(raw) {
     if (
       !raw ||
@@ -145,6 +190,10 @@
       !Array.isArray(raw.trips)
     )
       throw Error('Invalid backup');
+    if (
+      (raw.cashHistory !== undefined && !Array.isArray(raw.cashHistory)) ||
+      (raw.expenses !== undefined && !Array.isArray(raw.expenses))
+    ) throw Error('Invalid financial records');
     const state = defaultState(raw.settings);
     const s = raw.settings;
     state.settings.fuel = s.fuel === 'diesel' ? 'diesel' : 'gasoline';
@@ -155,6 +204,9 @@
     state.trips = raw.trips.slice(0, 500).map(cleanTrip).filter(Boolean);
     state.vehicles = state.vehicles.filter((v, i, a) => a.findIndex((x) => x.id === v.id) === i);
     state.trips = state.trips.filter((v, i, a) => a.findIndex((x) => x.id === v.id) === i);
+    // Older v4 backups remain valid. Finance entries join normal JSON exports.
+    state.cashHistory = uniqueRecords(raw.cashHistory || [], cleanCashRecord, 500);
+    state.expenses = uniqueRecords(raw.expenses || [], cleanExpense, 1000);
     return state;
   }
   function load(storage) {
@@ -222,6 +274,11 @@
     LEGACY_KEY,
     currencies,
     limits,
+    DENOMINATIONS,
+    EXPENSE_TYPES,
+    cashTotals,
+    cleanCashRecord,
+    cleanExpense,
     number,
     calculate,
     defaultState,

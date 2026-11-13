@@ -5,8 +5,8 @@
   "description": "A private, offline-first Arabic trip and fuel planner",
   "scripts": {
     "start": "node scripts/serve.cjs",
-    "check": "node --check core.js && node --check app.js && node --check map.js && node --check sw.js",
-    "test": "node --test tests/core.test.cjs tests/sw.test.cjs && node tests/map.test.js",
+    "check": "node --check core.js && node --check app.js && node --check map.js && node --check finance.js && node --check sw.js",
+    "test": "node --test tests/core.test.cjs tests/finance.test.cjs tests/sw.test.cjs && node tests/map.test.js",
     "test:e2e": "playwright test",
     "test:live": "node tests/live-services.cjs",
     "test:deployed": "node tests/deployed-version.cjs"
