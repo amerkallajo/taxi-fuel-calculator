@@ -10,8 +10,14 @@ test('mobile header stays visible and interactive after scrolling in both main a
 
   for (const view of ['trip', 'finance']) {
     await page.locator('[data-view="' + view + '"]').click();
-    await page.evaluate(() => window.scrollTo(0, 320));
-    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(150);
+    // Hashchange triggers an asynchronous scroll-to-top in the app, so wait
+    // for navigation to settle before simulating the user's downward swipe.
+    await expect(page).toHaveURL(new RegExp('#' + view + '$'));
+    await expect(page.locator('#view-' + view)).toBeVisible();
+    await expect.poll(() => page.evaluate(() => {
+      window.scrollTo({ top: 320, behavior: 'instant' });
+      return window.scrollY;
+    })).toBeGreaterThan(150);
 
     const placement = await page.locator('.topbar').evaluate((el) => {
       const rect = el.getBoundingClientRect();
