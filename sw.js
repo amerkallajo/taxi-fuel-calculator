@@ -1,11 +1,11 @@
 /* Road Cost 4. Explicit app-shell cache; APIs and map tiles never enter it. */
-const CACHE_NAME = 'road-cost-offline-v12';
+const CACHE_NAME = 'road-cost-offline-v13';
 const URLS = [
   './',
   './index.html',
   './styles.css?v=11',
   './core.js?v=12',
-  './app.js?v=12',
+  './app.js?v=13',
   './map.js?v=11',
   './finance.css?v=12',
   './finance.js?v=12',
@@ -23,8 +23,14 @@ const URLS = [
 const absolute = (path) => new URL(path, self.registration.scope).href;
 const SHELL = new Set(URLS.map(absolute));
 self.addEventListener('install', (event) => {
-  // A partial shell must never replace the last working installation.
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll([...SHELL])));
+  // Only take control after the entire new offline shell has cached successfully.
+  // This rescues installed clients still controlled by v11/v12: their old
+  // navigation handler otherwise keeps returning the old cached index.html.
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll([...SHELL]))
+      .then(() => self.skipWaiting())
+  );
 });
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();

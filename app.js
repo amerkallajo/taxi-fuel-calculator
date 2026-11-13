@@ -796,6 +796,8 @@
       const check = () => {
         if (navigator.onLine) swRegistration.update().catch(() => {});
       };
+      // Request a fresh worker check on every launch, including iOS home-screen mode.
+      check();
       window.addEventListener('pageshow', check);
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') check();
