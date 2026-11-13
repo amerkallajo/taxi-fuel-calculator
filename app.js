@@ -661,7 +661,7 @@
     window.dispatchEvent(new Event('roadcost:language'));
   }
   function showView(focus = false) {
-    const view = ['trip', 'garage', 'journal'].includes(location.hash.slice(1))
+    const view = ['trip', 'garage', 'journal', 'finance'].includes(location.hash.slice(1))
       ? location.hash.slice(1)
       : 'trip';
     document.querySelectorAll('.view').forEach((el) => (el.hidden = el.id !== 'view-' + view));
@@ -676,9 +676,11 @@
       trip: t('خطّط رحلة', 'Plan a trip'),
       garage: t('سياراتي', 'My vehicles'),
       journal: t('سجل الرحلات', 'Trip journal'),
+      finance: t('المصاري والمصاريف', 'Cash & expenses'),
     }[view];
     if (view === 'garage') renderVehicles();
     if (view === 'journal') renderJournal();
+    if (view === 'finance') window.dispatchEvent(new Event('roadcost:finance-view'));
     if (focus) {
       $('main').focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1040,7 +1042,9 @@
           clean = C.sanitizeState(raw);
         if (
           clean.trips.length !== raw.trips.length ||
-          clean.vehicles.length !== raw.vehicles.length
+          clean.vehicles.length !== raw.vehicles.length ||
+          clean.cashHistory.length !== (raw.cashHistory || []).length ||
+          clean.expenses.length !== (raw.expenses || []).length
         )
           throw Error('Invalid records');
         pendingImport = clean;
@@ -1049,7 +1053,11 @@
           clean.vehicles.length +
           t(' سيارة و', ' vehicles and ') +
           clean.trips.length +
-          t(' رحلة. ستستبدل بياناتك الحالية.', ' trips. This replaces your current data.');
+          t(' رحلة، و', ' trips, ') +
+          clean.cashHistory.length +
+          t(' عملية عد نقدي، و', ' cash counts, ') +
+          clean.expenses.length +
+          t(' مصروف. ستستبدل بياناتك الحالية.', ' expenses. This replaces your current data.');
         $('import-preview').hidden = false;
       } catch {
         $('import-message').textContent = t(
@@ -1125,7 +1133,28 @@
     translateStatic();
     update();
     registerWorker();
-    window.RoadApp = { getLanguage: () => state.settings.lang, t };
+    window.RoadApp = {
+      getLanguage: () => state.settings.lang,
+      t,
+      getFinanceData: () => ({
+        cashHistory: state.cashHistory,
+        expenses: state.expenses,
+        vehicles: state.vehicles,
+        defaultCurrency: state.settings.currency,
+      }),
+      saveFinanceData: (cashHistory, expenses) => {
+        try {
+          if (!Array.isArray(cashHistory) || !Array.isArray(expenses) ||
+              cashHistory.length > 500 || expenses.length > 1000) return false;
+          const next = C.sanitizeState({ ...state, cashHistory, expenses });
+          if (next.cashHistory.length !== cashHistory.length ||
+              next.expenses.length !== expenses.length) return false;
+          return persist(next);
+        } catch {
+          return false;
+        }
+      },
+    };
   }
   init();
 })();
