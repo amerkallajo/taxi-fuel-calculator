@@ -1,5 +1,5 @@
 /* Road Cost 5. Explicit app-shell cache; APIs and map tiles never enter it. */
-const CACHE_NAME = 'road-cost-offline-v19';
+const CACHE_NAME = 'road-cost-offline-v20';
 const URLS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const URLS = [
   './assets/amer-kallajo.webp',
   './map.js?v=11',
   './finance.js?v=12',
+  './analytics.js?v=1',
   './manifest.webmanifest?v=18',
   './fonts/alexandria.woff2',
   './apple-touch-icon.png',
