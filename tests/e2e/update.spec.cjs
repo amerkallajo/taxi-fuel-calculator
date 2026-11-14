@@ -1,5 +1,4 @@
 const { test, expect } = require('@playwright/test');
-const { calculatorPanel } = require('./layout.cjs');
 const http = require('node:http'),
   fs = require('node:fs'),
   path = require('node:path');
@@ -34,6 +33,7 @@ test('a complete update automatically replaces the stale installed shell and kee
         '.woff2': 'font/woff2',
         '.png': 'image/png',
         '.webmanifest': 'application/manifest+json',
+        '.webp': 'image/webp',
       };
       res.writeHead(200, {
         'Content-Type': types[path.extname(filename)] || 'application/octet-stream',
@@ -55,9 +55,7 @@ test('a complete update automatically replaces the stale installed shell and kee
     await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
     await page.locator('#price').fill('12000');
     await page.locator('#distance').fill('42');
-    await calculatorPanel(page, 'result');
-    await page.locator('#trip-name').fill('تبقى بعد التحديث');
-    await page.locator('#save-trip').click();
+    await page.locator('#roundtrip').check();
     version = currentVersion + 1;
     // An old v11/v12 client is controlled by a cache-first worker and must
     // refresh without requiring the user to discover the old update banner.
@@ -75,10 +73,9 @@ test('a complete update automatically replaces the stale installed shell and kee
       )
       .toBe(true);
     await expect(page.locator('#distance')).toHaveValue('42');
-    await expect(page.locator('#trip-name')).toHaveValue('تبقى بعد التحديث');
+    await expect(page.locator('#roundtrip')).toBeChecked();
+    await expect(page.locator('#price')).toHaveValue('12000');
     await expect(page.locator('#update-banner')).toBeHidden();
-    await page.locator('[data-view=journal]').click();
-    await expect(page.locator('#history-list')).toContainText('تبقى بعد التحديث');
     expect(
       await page.evaluate(
         async (v) => (await caches.keys()).includes('road-cost-offline-v' + v),

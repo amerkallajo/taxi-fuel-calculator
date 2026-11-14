@@ -1,4 +1,4 @@
-/* Road Cost 4. UI orchestration; all arithmetic and durable data validation live in core.js. */
+/* Road Cost 5. UI orchestration; all arithmetic and durable data validation live in core.js. */
 (() => {
   'use strict';
   const C = window.RoadCore,
@@ -19,14 +19,14 @@
     current = null,
     routeMeta = null,
     editVehicleId = null,
+    vehicleKml = NaN,
     pendingImport = null;
   let toastTimer,
     swRegistration,
     installPrompt,
-    lastSave = '',
     canonicalEfficiency = C.number(state.settings.efficiency);
   let currentUnit = state.settings.unit;
-  const numericFields = ['distance', 'efficiency', 'price', 'passengers', 'extra', 'reserve'];
+  const numericFields = ['distance', 'efficiency', 'price'];
   const t = (ar, en) => (state.settings.lang === 'en' ? en : ar);
   const fmt = (n, digits = 2) =>
     new Intl.NumberFormat('en-US', { maximumFractionDigits: digits }).format(n);
@@ -85,17 +85,13 @@
       distance: $('distance').value,
       efficiency: canonicalEfficiency,
       price: $('price').value,
-      passengers: $('passengers').value,
-      extra: $('extra').value,
-      reserve: $('reserve').value,
       roundtrip: $('roundtrip').checked,
     };
   }
   function saveDraft() {
     const draft = {};
-    for (const id of [...numericFields, 'trip-name', 'commute-days']) draft[id] = $(id).value;
+    for (const id of [...numericFields, 'commute-days']) draft[id] = $(id).value;
     draft.roundtrip = $('roundtrip').checked;
-    draft.favorite = $('save-favorite').checked;
     draft.unit = currentUnit;
     draft.currency = state.settings.currency;
     draft.fuel = state.settings.fuel;
@@ -109,10 +105,9 @@
     try {
       const d = JSON.parse(sessionStorage.getItem('road-cost-draft-v4') || 'null');
       if (!d || typeof d !== 'object') return;
-      for (const id of [...numericFields, 'trip-name', 'commute-days'])
+      for (const id of [...numericFields, 'commute-days'])
         if (typeof d[id] === 'string') $(id).value = d[id].slice(0, 80);
       $('roundtrip').checked = d.roundtrip === true;
-      $('save-favorite').checked = d.favorite === true;
       if (C.currencies.includes(d.currency)) state.settings.currency = d.currency;
       state.settings.fuel = d.fuel === 'diesel' ? 'diesel' : 'gasoline';
       currentUnit = C.efficiencyUnits.includes(d.unit) ? d.unit : 'kml';
@@ -168,9 +163,6 @@
       efficiencyMax = currentUnit === 'l100' ? 10000 : currentUnit === 'kmtank' ? 20000 : 1000;
     fieldError('efficiency', C.number($('efficiency').value), efficiencyMin, efficiencyMax);
     fieldError('price', C.number(i.price), 0, C.limits.price);
-    fieldError('passengers', C.number(i.passengers), 1, 50, true);
-    fieldError('extra', C.number(i.extra), 0, C.limits.extra);
-    fieldError('reserve', C.number(i.reserve), 0, 100);
     // Restrict sub-centimeter/absurd efficiency values consistently with field guidance.
     const rawEfficiency = C.number($('efficiency').value);
     const fieldsValid =
@@ -208,9 +200,9 @@
     $('mobile-total').textContent = current ? money(current.total) : '—';
     $('cost-unit').textContent = current ? currencyLabel(state.settings.currency) : '';
     $('cost-hint').textContent = current
-      ? t('حسبة واضحة قبل ما تتحرك.', 'A clear budget before you set off.')
+      ? t('حسبة واضحة قبل ما تتحرك.', 'A clear number before you set off.')
       : $('price').value.trim() === ''
-        ? t('أضف سعر اللتر لنحسبها سوا.', 'Add your fuel price to see the budget.')
+        ? t('أضف سعر اللتر لنحسبها سوا.', 'Add your fuel price to see the cost.')
         : t(
             'تحقق من مدخلات الرحلة لإكمال الحساب.',
             'Check the trip fields to complete the estimate.'
@@ -218,13 +210,7 @@
     setMetric('distance-total', km, kmLabel());
     setMetric('consumption', liters, literLabel(), 3);
     setMetric('per-km', current?.perKm ?? null, currencyLabel(state.settings.currency));
-    for (const [id, key] of [
-      ['fuel-cost', 'fuel'],
-      ['reserve-cost', 'buffer'],
-      ['extra-cost', 'extra'],
-      ['per-person', 'perPerson'],
-    ])
-      $(id).textContent = current ? money(current[key]) : '—';
+    setMetric('tanks-needed', liters === null ? null : liters / C.TANK_LITERS, '', 2);
     const days = C.number($('commute-days').value),
       daysValid = fieldError('commute-days', days, 1, 366, true);
     setMetric(
@@ -238,7 +224,6 @@
       currencyLabel(state.settings.currency)
     );
     $('copy').disabled = !current;
-    $('save-trip').disabled = !current || saveSignature() === lastSave;
     $('distance-source').textContent = routeMeta
       ? t('طريق محسوب · OSRM', 'Road route · OSRM')
       : t('إدخال يدوي', 'Manual distance');
@@ -272,241 +257,8 @@
     }
     renderComparison();
   }
-  function saveSignature() {
-    return JSON.stringify([
-      inputValues(),
-      state.settings.currency,
-      state.settings.fuel,
-      $('trip-name').value,
-      $('save-favorite').checked,
-    ]);
-  }
-  function saveTrip() {
-    if (!current || lastSave === saveSignature()) return;
-    if (state.trips.length >= 500) {
-      toast(
-        t(
-          'السجل ممتلئ (500 رحلة). صدّر نسخة ثم احذف رحلات قديمة.',
-          'Journal is full (500 trips). Export a backup, then remove older trips.'
-        )
-      );
-      return;
-    }
-    const item = {
-      id: uid(),
-      name: $('trip-name').value.trim() || t('مشوار جديد', 'New trip'),
-      date: Date.now(),
-      currency: state.settings.currency,
-      input: inputValues(),
-      fuel: state.settings.fuel,
-      favorite: $('save-favorite').checked,
-      source: routeMeta ? 'road' : 'manual',
-    };
-    const next = {
-      ...state,
-      trips: [C.sanitizeState({ ...state, trips: [item] }).trips[0], ...state.trips],
-    };
-    if (!persist(next)) return;
-    lastSave = saveSignature();
-    update({ save: false });
-    renderJournal();
-    renderFavorites();
-    toast(t('انحفظ المشوار في دفتر رحلاتك.', 'Trip saved to your journal.'));
-  }
-  function loadTrip(id) {
-    const trip = state.trips.find((x) => x.id === id);
-    if (!trip) return;
-    // Favorites reuse the distance/options with the CURRENT fuel settings and price.
-    for (const key of ['distance', 'passengers', 'extra', 'reserve'])
-      $(key).value = String(trip.input[key]);
-    $('roundtrip').checked = trip.input.roundtrip;
-    if (trip.currency !== state.settings.currency) {
-      $('extra').value = '0';
-      toast(
-        t(
-          'عملة مختلفة: صُفّرت الإضافات. راجع السعر والميزانية الحالية.',
-          'Different currency: extras reset. Review the current price and budget.'
-        )
-      );
-    } else
-      toast(
-        t(
-          'حُمل المشوار بسعر الوقود وإعدادات السيارة الحالية.',
-          'Trip loaded with your current vehicle settings and fuel price.'
-        )
-      );
-    $('trip-name').value = trip.name;
-    $('save-favorite').checked = trip.favorite;
-    routeMeta = null;
-    lastSave = '';
-    window.dispatchEvent(new Event('roadcost:clear-route'));
-    update();
-    location.hash = 'trip';
-    $('distance').focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }
-  function renderFavorites() {
-    const favorites = state.trips.filter((x) => x.favorite).slice(0, 4);
-    $('favorites-list').innerHTML = favorites.length
-      ? favorites
-          .map(
-            (x) =>
-              '<div class="favorite-item">' +
-              icon('route') +
-              '<div><strong>' +
-              escape(x.name) +
-              '</strong><small>' +
-              fmt(x.input.distance * (x.input.roundtrip ? 2 : 1)) +
-              ' ' +
-              kmLabel() +
-              ' · ' +
-              t('أعد الحساب بالسعر الحالي', 'Recalculate at current price') +
-              '</small></div><button class="button secondary" data-load-trip="' +
-              escape(x.id) +
-              '">' +
-              t('احسبها', 'Use trip') +
-              '</button></div>'
-          )
-          .join('')
-      : '<p class="empty-inline">' +
-        t(
-          'احفظ مشوارك كمفضلة، وارجع احسبه بسعر اليوم بكبسة واحدة.',
-          'Save a favorite, then recalculate it at today’s price in one tap.'
-        ) +
-        '</p>';
-    $('trip-count').textContent = state.trips.length;
-  }
   function monthKey(date) {
     return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
-  }
-  function filteredTrips() {
-    return state.trips.filter(
-      (x) =>
-        x.currency === $('journal-currency').value &&
-        monthKey(new Date(x.date)) === $('journal-month').value &&
-        (!$('favorites-only').checked || x.favorite)
-    );
-  }
-  function renderJournal() {
-    const trips = filteredTrips(),
-      currency = $('journal-currency').value;
-    let sum = 0,
-      km = 0;
-    trips.forEach((x) => {
-      const r = C.calculate(x.input);
-      sum += r.total;
-      km += r.km;
-    });
-    setMetric('journal-total', sum, currencyLabel(currency));
-    setMetric('journal-km', km, kmLabel());
-    $('journal-trips').textContent = trips.length;
-    $('history-count').textContent = trips.length + ' ' + t('رحلة', 'trips');
-    $('export-csv').disabled = !trips.length;
-    $('chart-currency').textContent = currencyLabel(currency);
-    $('history-list').innerHTML = trips.length
-      ? trips
-          .map((x) => {
-            const r = C.calculate(x.input);
-            const date = new Intl.DateTimeFormat(state.settings.lang === 'en' ? 'en-GB' : 'ar-SY', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            }).format(new Date(x.date));
-            return (
-              '<article class="card trip-record"><div class="record-icon">' +
-              icon('route') +
-              '</div><div class="record-main"><h3>' +
-              escape(x.name) +
-              '</h3><p>' +
-              escape(date) +
-              ' · ' +
-              fmt(r.km) +
-              ' ' +
-              kmLabel() +
-              ' · ' +
-              (x.source === 'road'
-                ? t('مسافة طريق محفوظة', 'Saved road distance')
-                : t('مسافة يدوية', 'Manual distance')) +
-              '</p></div><div class="record-price">' +
-              fmt(r.total) +
-              ' <small>' +
-              currencyLabel(x.currency) +
-              '</small></div><div class="record-actions"><button class="text-button" data-load-trip="' +
-              escape(x.id) +
-              '">' +
-              t('إعادة الحساب', 'Recalculate') +
-              '</button><button class="icon-button ' +
-              (x.favorite ? 'is-favorite' : '') +
-              '" data-favorite="' +
-              escape(x.id) +
-              '" aria-pressed="' +
-              x.favorite +
-              '" aria-label="' +
-              t('المفضلة', 'Favorite') +
-              '">' +
-              icon('star') +
-              '</button><button class="icon-button" data-delete-trip="' +
-              escape(x.id) +
-              '" aria-label="' +
-              t('حذف الرحلة', 'Delete trip') +
-              '">' +
-              icon('trash') +
-              '</button></div></article>'
-            );
-          })
-          .join('')
-      : '<div class="empty-state">' +
-        icon('history') +
-        '<h2>' +
-        t('أول مشوار بيبلّش من هون.', 'Your first trip starts here.') +
-        '</h2><p>' +
-        t(
-          'احفظ رحلة من الحاسبة، أو غيّر الشهر والعملة لتشوف رحلاتك.',
-          'Save a trip from the planner, or change the month and currency to find your trips.'
-        ) +
-        '</p><a class="button primary" href="#trip" style="margin-top:20px">' +
-        t('خطّط رحلة', 'Plan a trip') +
-        '</a></div>';
-    const selected = /^\d{4}-\d{2}$/.test($('journal-month').value)
-      ? $('journal-month').value
-      : monthKey(new Date());
-    const [year, month] = selected.split('-').map(Number),
-      months = [];
-    for (let offset = 5; offset >= 0; offset--) {
-      const date = new Date(year, month - 1 - offset, 1),
-        key = monthKey(date);
-      const total = state.trips
-        .filter(
-          (x) =>
-            x.currency === currency &&
-            monthKey(new Date(x.date)) === key &&
-            (!$('favorites-only').checked || x.favorite)
-        )
-        .reduce((sum, x) => sum + C.calculate(x.input).total, 0);
-      months.push({ date, total });
-    }
-    const max = Math.max(...months.map((x) => x.total), 1);
-    $('history-chart').innerHTML = months
-      .map(
-        (x) =>
-          '<div class="chart-column"><b>' +
-          fmt(x.total, 0) +
-          '</b><div class="chart-bar" style="--height:' +
-          Math.max(2, (x.total / max) * 112) +
-          'px"></div><small>' +
-          escape(
-            new Intl.DateTimeFormat(state.settings.lang === 'en' ? 'en-GB' : 'ar-SY', {
-              month: 'short',
-              year: '2-digit',
-            }).format(x.date)
-          ) +
-          '</small></div>'
-      )
-      .join('');
-    $('history-chart').setAttribute(
-      'aria-label',
-      months.map((x) => monthKey(x.date) + ': ' + money(x.total, currency)).join('; ')
-    );
   }
   function renderVehicles() {
     const selected = $('vehicle-select').value;
@@ -518,27 +270,40 @@
         .map((v) => '<option value="' + escape(v.id) + '">' + escape(v.name) + '</option>')
         .join('');
     if (state.vehicles.some((v) => v.id === selected)) $('vehicle-select').value = selected;
+    const stat = (label, value, highlight = false) =>
+      '<div' +
+      (highlight ? ' class="highlight"' : '') +
+      '><span>' +
+      label +
+      '</span><strong dir="auto">' +
+      escape(value) +
+      '</strong></div>';
     $('vehicles-list').innerHTML = state.vehicles.length
       ? state.vehicles
           .map(
             (v) =>
-              '<article class="card vehicle-card"><div class="vehicle-icon">' +
+              '<article class="card vehicle-card"><div class="vehicle-head"><div class="vehicle-icon">' +
               icon('car') +
-              '</div><h2>' +
+              '</div><div class="vehicle-title"><h2>' +
               escape(v.name) +
-              '</h2><p>' +
+              '</h2><span class="pill">' +
               (v.fuel === 'diesel' ? t('مازوت', 'Diesel') : t('بنزين', 'Gasoline')) +
-              ' · ' +
-              t('إعداداتك المحفوظة', 'Your saved settings') +
-              '</p><div class="vehicle-stats"><div><span>' +
-              t('كم/لتر', 'km/L') +
-              '</span><strong>' +
-              fmt(v.efficiency, 3) +
-              '</strong></div><div><span>' +
-              t('سعر اللتر', 'Price per liter') +
-              '</span><strong>' +
-              escape(money(v.price, v.currency)) +
-              '</strong></div></div><div class="vehicle-actions"><button class="button primary" data-use-vehicle="' +
+              '</span></div><button class="icon-button danger" data-delete-vehicle="' +
+              escape(v.id) +
+              '" aria-label="' +
+              t('حذف السيارة', 'Delete vehicle') +
+              '">' +
+              icon('trash') +
+              '</button></div><div class="vehicle-stats">' +
+              stat(t('كم باللتر', 'Km per liter'), fmt(v.efficiency, 2), true) +
+              stat(
+                t('كم بالتنكة (20 لتر)', 'Km per tank (20 L)'),
+                fmt(v.efficiency * C.TANK_LITERS, 1),
+                true
+              ) +
+              stat(t('سعر اللتر', 'Price per liter'), money(v.price, v.currency)) +
+              stat(t('سعر التنكة', 'Tank price'), money(v.price * C.TANK_LITERS, v.currency)) +
+              '</div><div class="vehicle-actions"><button class="button primary" data-use-vehicle="' +
               escape(v.id) +
               '">' +
               t('استخدم للمشوار', 'Use for trip') +
@@ -546,12 +311,6 @@
               escape(v.id) +
               '">' +
               t('تعديل', 'Edit') +
-              '</button><button class="icon-button" data-delete-vehicle="' +
-              escape(v.id) +
-              '" aria-label="' +
-              t('حذف السيارة', 'Delete vehicle') +
-              '">' +
-              icon('trash') +
               '</button></div></article>'
           )
           .join('')
@@ -561,10 +320,13 @@
         t('خلّي سيارتك جاهزة للحسبة.', 'Keep your vehicle ready to go.') +
         '</h2><p>' +
         t(
-          'أضف سيارتك واستهلاكها وسعر الوقود، لتستعملها بأي مشوار وتقارنها مع غيرها.',
-          'Add a vehicle, its fuel economy and fuel price to reuse or compare on any trip.'
+          'أضف سيارتك وكم بتمشي باللتر أو بالتنكة، لتستعملها بأي مشوار وتقارنها مع غيرها.',
+          'Add a vehicle and how far it goes per liter or per tank, then reuse or compare it on any trip.'
         ) +
-        '</p></div>';
+        '</p><button class="button primary" data-add-vehicle>' +
+        icon('plus') +
+        t('إضافة سيارة', 'Add vehicle') +
+        '</button></div>';
     renderComparison();
   }
   function renderComparison() {
@@ -573,7 +335,7 @@
       .filter((v) => v.currency === state.settings.currency)
       .map((v) => ({
         v,
-        r: C.calculate({ ...i, efficiency: v.efficiency, price: v.price, extra: 0, reserve: 0 }),
+        r: C.calculate({ ...i, efficiency: v.efficiency, price: v.price }),
       }))
       .filter((x) => x.r)
       .sort((a, b) => a.r.fuel - b.r.fuel);
@@ -587,7 +349,9 @@
       ? rows
           .map(
             ({ v, r }, index) =>
-              '<div class="comparison-row"><div class="comparison-name">' +
+              '<div class="comparison-row' +
+              (index === 0 && rows.length > 1 ? ' best' : '') +
+              '"><div class="comparison-name">' +
               escape(v.name) +
               '<small>' +
               (index === 0 && rows.length > 1
@@ -611,31 +375,38 @@
     const v = state.vehicles.find((v) => v.id === id);
     editVehicleId = v?.id || null;
     $('vehicle-name').value = v?.name || '';
-    $('vehicle-efficiency').value =
+    const kml =
       v?.efficiency ??
-      (Number.isFinite(canonicalEfficiency)
-        ? fmt(canonicalEfficiency, 6).replaceAll(',', '')
-        : '12');
+      (canonicalEfficiency >= 0.01 && canonicalEfficiency <= 1000 ? canonicalEfficiency : 12);
+    vehicleKml = kml;
+    $('vehicle-efficiency').value = trimNumber(kml);
+    $('vehicle-tank').value = trimNumber(kml * C.TANK_LITERS);
     $('vehicle-price').value = v?.price ?? $('price').value;
     $('vehicle-fuel').value = v?.fuel || state.settings.fuel;
     $('vehicle-currency').value = v?.currency || state.settings.currency;
     $('vehicle-error').textContent = '';
     $('vehicle-dialog').showModal();
   }
+  // The garage form keeps km/L and km per 20 L tank in step; the last edited box wins.
+  const trimNumber = (n) => (Number.isFinite(n) ? String(Number(n.toFixed(4))) : '');
+  function linkEfficiency(source) {
+    const n = C.number($(source).value),
+      valid = Number.isFinite(n) && n > 0,
+      fromTank = source === 'vehicle-tank';
+    vehicleKml = valid ? (fromTank ? n / C.TANK_LITERS : n) : NaN;
+    $(fromTank ? 'vehicle-efficiency' : 'vehicle-tank').value = valid
+      ? trimNumber(fromTank ? n / C.TANK_LITERS : n * C.TANK_LITERS)
+      : '';
+  }
   function useVehicle(id) {
     const v = state.vehicles.find((v) => v.id === id);
     if (!v) return;
-    if (state.settings.currency !== v.currency) {
-      $('extra').value = '0';
-      toast(t('تغيّرت العملة؛ صُفّرت المصاريف الإضافية.', 'Currency changed; extra costs reset.'));
-    }
     canonicalEfficiency = v.efficiency;
     $('efficiency').value = String(C.efficiencyFromKml(v.efficiency, currentUnit));
     $('price').value = String(v.price);
     state.settings.currency = v.currency;
     state.settings.fuel = v.fuel;
     $('vehicle-select').value = v.id;
-    lastSave = '';
     update();
   }
   function applyTheme() {
@@ -643,7 +414,7 @@
       state.settings.theme === 'dark' ||
       (state.settings.theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]').content = dark ? '#101929' : '#f5f7fb';
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#090f1c' : '#f3f5f9';
     $('theme').setAttribute('aria-pressed', String(dark));
   }
   function translateStatic() {
@@ -671,20 +442,14 @@
     $('efficiency-unit').options[1].textContent = t('لتر/100كم', 'L/100km');
     $('efficiency-unit').options[2].textContent = t('كم/تنكة', 'km/20L');
     renderVehicles();
-    renderFavorites();
-    renderJournal();
     update({ save: false });
     showView(false);
-    selectCalculatorPanel($('view-trip').dataset.panel);
     connectionStatus();
     window.dispatchEvent(new Event('roadcost:language'));
   }
   function showView(focus = false) {
-    const view = ['welcome', 'services', 'trip', 'garage', 'journal', 'finance'].includes(
-      location.hash.slice(1)
-    )
-      ? location.hash.slice(1)
-      : 'welcome';
+    const hash = location.hash.slice(1),
+      view = ['trip', 'garage', 'finance'].includes(hash) ? hash : 'home';
     document.body.dataset.page = view;
     document.querySelectorAll('.view').forEach((el) => (el.hidden = el.id !== 'view-' + view));
     document
@@ -694,34 +459,12 @@
           ? el.setAttribute('aria-current', 'page')
           : el.removeAttribute('aria-current')
       );
-    $('page-label').textContent = {
-      welcome: t('أهلًا فيك', 'Welcome'),
-      services: t('كل الخدمات', 'All services'),
-      trip: t('خطّط رحلة', 'Plan a trip'),
-      garage: t('سياراتي', 'My vehicles'),
-      journal: t('سجل الرحلات', 'Trip journal'),
-      finance: t('المصاري والمصاريف', 'Cash & expenses'),
-    }[view];
     if (view === 'garage') renderVehicles();
-    if (view === 'journal') renderJournal();
     if (view === 'finance') window.dispatchEvent(new Event('roadcost:finance-view'));
     if (focus) {
-      if (view === 'trip') selectCalculatorPanel('inputs');
       $('main').focus({ preventScroll: true });
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }
-  function selectCalculatorPanel(panel) {
-    const result = panel === 'result';
-    $('view-trip').dataset.panel = result ? 'result' : 'inputs';
-    document.querySelectorAll('[data-calculator-panel]').forEach((button) => {
-      const selected = button.dataset.calculatorPanel === (result ? 'result' : 'inputs');
-      button.setAttribute('aria-selected', String(selected));
-      button.tabIndex = selected ? 0 : -1;
-    });
-    $('show-summary').textContent = result
-      ? t('تعديل المدخلات', 'Edit details')
-      : t('عرض النتيجة', 'See result');
   }
   function download(filename, body, type) {
     const blob = new Blob([body], { type }),
@@ -739,7 +482,7 @@
     const r = current,
       text =
         'Road Cost – ' +
-        ($('trip-name').value.trim() || t('ميزانية رحلة', 'Trip budget')) +
+        t('تكلفة وقود المشوار', 'Trip fuel cost') +
         '\n' +
         t('المسافة: ', 'Distance: ') +
         fmt(r.km) +
@@ -756,16 +499,8 @@
         t('سعر اللتر: ', 'Price per liter: ') +
         money(C.number($('price').value)) +
         '\n' +
-        t('احتياط + إضافات: ', 'Cushion + extras: ') +
-        money(r.buffer + r.extra) +
-        '\n' +
-        t('الإجمالي التقديري: ', 'Total estimate: ') +
+        t('التكلفة التقديرية: ', 'Estimated cost: ') +
         money(r.total) +
-        '\n' +
-        t('حصة الشخص: ', 'Per person: ') +
-        money(r.perPerson) +
-        ' / ' +
-        r.passengers +
         '\nhttps://amerkallajo.github.io/taxi-fuel-calculator/';
     try {
       if (navigator.share) {
@@ -865,8 +600,6 @@
     $('efficiency').value = String(C.efficiencyFromKml(canonicalEfficiency, currentUnit));
     $('price').value = state.settings.price;
     restoreDraft();
-    $('journal-month').value = monthKey(new Date());
-    $('journal-currency').value = state.settings.currency;
     numericFields.forEach((id) =>
       $(id).addEventListener('input', () => {
         if (id === 'distance') {
@@ -877,8 +610,7 @@
         update({ read: id === 'efficiency' });
       })
     );
-    for (const id of ['roundtrip', 'commute-days', 'trip-name', 'save-favorite'])
-      $(id).addEventListener('input', () => update());
+    for (const id of ['roundtrip', 'commute-days']) $(id).addEventListener('input', () => update());
     $('efficiency-unit').addEventListener('change', () => {
       currentUnit = $('efficiency-unit').value;
       if (Number.isFinite(canonicalEfficiency) && canonicalEfficiency > 0)
@@ -907,47 +639,27 @@
       $('map-section').open = true;
       $('map-section').scrollIntoView({ behavior: 'auto', block: 'start' });
     });
-    document.querySelectorAll('[data-calculator-panel]').forEach((button) => {
-      button.addEventListener('click', () => selectCalculatorPanel(button.dataset.calculatorPanel));
-      button.addEventListener('keydown', (event) => {
-        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-        event.preventDefault();
-        const panel =
-          event.key === 'Home'
-            ? 'inputs'
-            : event.key === 'End'
-              ? 'result'
-              : button.dataset.calculatorPanel === 'inputs'
-                ? 'result'
-                : 'inputs';
-        selectCalculatorPanel(panel);
-        $('calculator-' + panel + '-tab').focus();
-      });
-    });
-    $('show-summary').addEventListener('click', () => {
-      if (matchMedia('(max-width: 700px)').matches) {
-        selectCalculatorPanel($('view-trip').dataset.panel === 'result' ? 'inputs' : 'result');
-        $('trip-heading').scrollIntoView({ block: 'start' });
-        return;
-      }
+    $('show-summary').addEventListener('click', () =>
       document.querySelector('.estimate-card').scrollIntoView({
         behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-        block: 'start',
-      });
-    });
+        block: 'center',
+      })
+    );
+    // The floating total is only useful while the full result card is off screen.
+    if ('IntersectionObserver' in window)
+      new IntersectionObserver(
+        ([entry]) =>
+          document
+            .querySelector('.mobile-total-bar')
+            .classList.toggle('is-hidden', entry.isIntersecting),
+        { threshold: 0.35 }
+      ).observe(document.querySelector('.estimate-card'));
     $('vehicle-select').addEventListener('change', () => useVehicle($('vehicle-select').value));
-    $('save-trip').addEventListener('click', saveTrip);
     $('copy').addEventListener('click', share);
     $('reset').addEventListener('click', () => {
       $('distance').value = '20';
-      $('passengers').value = '1';
-      $('extra').value = '0';
-      $('reserve').value = '0';
-      $('trip-name').value = '';
       $('roundtrip').checked = false;
-      $('save-favorite').checked = false;
       routeMeta = null;
-      lastSave = '';
       window.dispatchEvent(new Event('roadcost:clear-route'));
       update();
       toast(t('رحلة جديدة. إعدادات سيارتك باقية.', 'New trip. Your vehicle settings are kept.'));
@@ -966,9 +678,23 @@
       // RTL/LTR text reflow should not move the reader away from their fields.
       window.scrollTo({ top: previousScroll, behavior: 'instant' });
     });
-    ['open-settings', 'mobile-settings'].forEach((id) =>
-      $(id).addEventListener('click', () => $('settings-dialog').showModal())
+    $('open-settings').addEventListener('click', () => $('settings-dialog').showModal());
+    // A tap on the dimmed backdrop closes a sheet, as people expect on phones.
+    document.querySelectorAll('dialog').forEach((dialog) =>
+      dialog.addEventListener('click', (e) => {
+        if (e.target !== dialog) return;
+        const box = dialog.getBoundingClientRect();
+        if (
+          e.clientX < box.left ||
+          e.clientX > box.right ||
+          e.clientY < box.top ||
+          e.clientY > box.bottom
+        )
+          dialog.close();
+      })
     );
+    for (const id of ['vehicle-efficiency', 'vehicle-tank'])
+      $(id).addEventListener('input', () => linkEfficiency(id));
     document
       .querySelectorAll('[data-close]')
       .forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
@@ -989,19 +715,20 @@
       installPrompt = null;
       $('install-native').hidden = true;
     });
-    $('add-vehicle').addEventListener('click', () => {
+    const addVehicle = () => {
       if (state.vehicles.length >= 20) {
         toast(t('يمكنك حفظ 20 سيارة.', 'You can save up to 20 vehicles.'));
         return;
       }
       vehicleDialog();
-    });
+    };
+    $('add-vehicle').addEventListener('click', addVehicle);
     $('vehicle-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const v = {
         id: editVehicleId || uid(),
         name: $('vehicle-name').value.trim(),
-        efficiency: C.number($('vehicle-efficiency').value),
+        efficiency: vehicleKml,
         price: C.number($('vehicle-price').value),
         fuel: $('vehicle-fuel').value,
         currency: $('vehicle-currency').value,
@@ -1009,8 +736,8 @@
       const clean = C.sanitizeState({ ...state, vehicles: [v] }).vehicles[0];
       if (!clean) {
         $('vehicle-error').textContent = t(
-          'أدخل اسماً، كفاءة من 0.01 إلى 1000، وسعراً من 0 إلى مليار.',
-          'Enter a name, efficiency from 0.01 to 1,000 and a price from 0 to 1 billion.'
+          'أدخل اسماً، وكم بتمشي السيارة باللتر (0.01 إلى 1000) أو بالتنكة، وسعراً صالحاً للتر.',
+          'Enter a name, the km per liter (0.01 to 1,000) or per tank, and a valid price per liter.'
         );
         return;
       }
@@ -1029,7 +756,7 @@
     document.addEventListener('click', (e) => {
       const b = e.target.closest('button');
       if (!b) return;
-      if (b.dataset.loadTrip) loadTrip(b.dataset.loadTrip);
+      if ('addVehicle' in b.dataset) addVehicle();
       if (b.dataset.useVehicle) {
         useVehicle(b.dataset.useVehicle);
         location.hash = 'trip';
@@ -1043,46 +770,10 @@
           })
         ) {
           renderVehicles();
-          toast(
-            t('حُذفت السيارة. الرحلات المحفوظة باقية.', 'Vehicle deleted. Saved trips are kept.')
-          );
-        }
-      }
-      if (b.dataset.favorite) {
-        if (
-          persist({
-            ...state,
-            trips: state.trips.map((x) =>
-              x.id === b.dataset.favorite ? { ...x, favorite: !x.favorite } : x
-            ),
-          })
-        ) {
-          renderJournal();
-          renderFavorites();
-        }
-      }
-      if (b.dataset.deleteTrip) {
-        if (
-          persist({ ...state, trips: state.trips.filter((x) => x.id !== b.dataset.deleteTrip) })
-        ) {
-          lastSave = '';
-          renderJournal();
-          renderFavorites();
-          update({ save: false });
-          toast(t('حُذفت الرحلة.', 'Trip deleted.'));
+          toast(t('حُذفت السيارة.', 'Vehicle deleted.'));
         }
       }
     });
-    ['journal-month', 'journal-currency', 'favorites-only'].forEach((id) =>
-      $(id).addEventListener('change', renderJournal)
-    );
-    $('export-csv').addEventListener('click', () =>
-      download(
-        'road-cost-' + $('journal-month').value + '.csv',
-        C.csv(filteredTrips()),
-        'text/csv;charset=utf-8'
-      )
-    );
     $('export-backup').addEventListener('click', () =>
       download(
         'road-cost-backup-' + monthKey(new Date()) + '.json',
@@ -1111,9 +802,7 @@
         $('import-description').textContent =
           t('تحتوي النسخة على ', 'Backup contains ') +
           clean.vehicles.length +
-          t(' سيارة و', ' vehicles and ') +
-          clean.trips.length +
-          t(' رحلة، و', ' trips, ') +
+          t(' سيارة، و', ' vehicles, ') +
           clean.cashHistory.length +
           t(' عملية عد نقدي، و', ' cash counts, ') +
           clean.expenses.length +
@@ -1135,8 +824,6 @@
       canonicalEfficiency = C.number(state.settings.efficiency);
       $('efficiency').value = String(C.efficiencyFromKml(canonicalEfficiency, currentUnit));
       $('price').value = state.settings.price;
-      $('journal-currency').value = state.settings.currency;
-      lastSave = '';
       applyTheme();
       translateStatic();
       update();
@@ -1176,7 +863,6 @@
     });
     window.addEventListener('roadcost:route', (e) => {
       routeMeta = e.detail;
-      lastSave = '';
       update();
     });
     window.addEventListener('roadcost:route-invalid', () => {

@@ -1,6 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { calculatorPanel } = require('./layout.cjs');
-test('real Chromium worker caches the shell and supports offline reload and journal', async ({
+test('real Chromium worker caches the shell and supports offline reload and saved vehicles', async ({
   page,
   context,
   browserName,
@@ -14,28 +13,32 @@ test('real Chromium worker caches the shell and supports offline reload and jour
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
   await page.locator('#price').fill('12000');
   await page.locator('#efficiency').fill('10');
-  await calculatorPanel(page, 'result');
-  await page.locator('#trip-name').fill('رحلة دون نت');
-  await page.locator('#save-trip').click();
+  await page.locator('[data-view="garage"]').click();
+  await page.locator('#add-vehicle').click();
+  await page.locator('#vehicle-name').fill('سيارة دون نت');
+  await page.locator('#vehicle-tank').fill('200');
+  await page.locator('#vehicle-form button[type=submit]').click();
+  await expect(page.locator('.vehicle-card')).toHaveCount(1);
+  await page.locator('[data-view="trip"]').click();
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('#cost-number')).toHaveText('24,000');
   await expect(page.locator('#connection-label')).toContainText('بلا نت');
   await page.locator('#distance').fill('50');
   await expect(page.locator('#cost-number')).toHaveText('60,000');
-  await page.locator('[data-view="journal"]').click();
-  await expect(page.locator('#history-list')).toContainText('رحلة دون نت');
+  await page.locator('[data-view="garage"]').click();
+  await expect(page.locator('#vehicles-list')).toContainText('سيارة دون نت');
   await page.locator('[data-view="trip"]').click();
   await page.locator('#open-map').click();
   await expect(page.locator('#map-status')).toContainText('إنترنت');
   await page.goto('./');
-  await expect(page.locator('#view-welcome')).toBeVisible();
-  for (const selector of ['.creator-card img', '.welcome-visual img'])
+  await expect(page.locator('#view-home')).toBeVisible();
+  for (const selector of ['.creator-card img', '.hero-visual img'])
     expect(
       await page.locator(selector).evaluate((img) => img.complete && img.naturalWidth > 0)
     ).toBe(true);
   await page.locator('#start-calculation').click();
-  await expect(page.locator('#view-services')).toBeVisible();
+  await expect(page.locator('#view-trip')).toBeVisible();
   const urls = await page.evaluate(async () => {
     const name = (await caches.keys()).find((x) => x.startsWith('road-cost-offline-v'));
     const c = await caches.open(name);

@@ -7,13 +7,11 @@ const revision = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }
 const assets = [
   'index.html',
   'styles.css',
-  'experience.css',
   'assets/amer-kallajo.webp',
   'assets/welcome-road.webp',
   'core.js',
   'app.js',
   'map.js',
-  'finance.css',
   'finance.js',
   'sw.js',
   'manifest.webmanifest',

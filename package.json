@@ -1,6 +1,6 @@
 {
   "name": "road-cost",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "private": true,
   "description": "A private, offline-first Arabic trip and fuel planner",
   "scripts": {

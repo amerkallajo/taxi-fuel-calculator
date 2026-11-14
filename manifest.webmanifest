@@ -2,14 +2,14 @@
   "id": "./",
   "name": "Road Cost – حاسبة تكاليف الطريق",
   "short_name": "Road Cost",
-  "description": "خطط رحلتك، قارن سياراتك واحفظ ميزانية الوقود. حاسبة خاصة تعمل دون إنترنت.",
+  "description": "احسب وقود مشوارك باللتر أو بالتنكة، قارن سياراتك ورتّب مصاريفك. تعمل دون إنترنت.",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f5f7fb",
-  "theme_color": "#f5f7fb",
+  "background_color": "#f3f5f9",
+  "theme_color": "#f3f5f9",
   "icons": [
     {
       "src": "./icons/road-cost-180.png?v=6",

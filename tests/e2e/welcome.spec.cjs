@@ -1,53 +1,56 @@
 const { test, expect } = require('@playwright/test');
 test.use({ serviceWorkers: 'block' });
 
-test('mobile calculator separates inputs and result with keyboard and a fixed result button', async ({
+test('mobile calculator keeps a floating total until the full result is on screen', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./#trip');
-  await expect(page.locator('#trip-input-panel')).toBeVisible();
-  await expect(page.locator('#trip-result-panel')).toBeHidden();
   await page.locator('#price').fill('12000');
-  await page.locator('#calculator-inputs-tab').focus();
-  await page.keyboard.press('ArrowLeft');
-  await expect(page.locator('#calculator-result-tab')).toBeFocused();
-  await expect(page.locator('#calculator-result-tab')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('#trip-input-panel')).toBeHidden();
-  await expect(page.locator('#cost-number')).toBeVisible();
+  const bar = page.locator('.mobile-total-bar');
+  await expect(bar).toBeVisible();
+  await expect(page.locator('#mobile-total')).toContainText('20,000');
+  const placement = await bar.evaluate((el) => {
+    const bar = el.getBoundingClientRect(),
+      nav = document.querySelector('.navigation').getBoundingClientRect();
+    return { barBottom: bar.bottom, navTop: nav.top, navBottom: nav.bottom, height: innerHeight };
+  });
+  expect(placement.barBottom).toBeLessThanOrEqual(placement.navTop);
+  expect(placement.navBottom).toBeLessThanOrEqual(placement.height);
+  await page.locator('#show-summary').click();
+  await expect(page.locator('#cost-number')).toBeInViewport();
   await expect(page.locator('#cost-number')).toHaveText('20,000');
-  await page.locator('#show-summary').click();
-  await expect(page.locator('#trip-input-panel')).toBeVisible();
-  await expect(page.locator('#trip-result-panel')).toBeHidden();
-  await page.locator('#show-summary').click();
-  await expect(page.locator('#trip-result-panel')).toBeVisible();
+  await expect(bar).toHaveClass(/is-hidden/);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect(bar).not.toHaveClass(/is-hidden/);
 });
 
-test('Arabic welcome introduces Amer, privacy and free access before choosing a service', async ({
+test('Arabic home introduces Amer, privacy and free access before choosing a service', async ({
   page,
 }) => {
   await page.goto('./');
-  await expect(page.locator('#view-welcome')).toBeVisible();
+  await expect(page.locator('#view-home')).toBeVisible();
   await expect(page.locator('#view-trip')).toBeHidden();
   await expect(page.locator('.creator-card')).toContainText('عامر قلاجو');
-  await expect(page.locator('.welcome-assurance')).toContainText('مجانية. للجميع.');
+  await expect(page.locator('.hero-points')).toContainText('مجانية للجميع');
   await expect(page.locator('.welcome-privacy')).toContainText('متصفحك فقط');
   expect(
     await page.locator('.creator-card img').evaluate((img) => img.complete && img.naturalWidth > 0)
   ).toBe(true);
   const box = await page.locator('#start-calculation').boundingBox();
   expect(box.y + box.height).toBeLessThan(page.viewportSize().height);
+  await expect(page.locator('.service-card')).toHaveCount(3);
   await page.locator('#start-calculation').click();
-  await expect(page.locator('#view-services')).toBeVisible();
-  await expect(page.locator('.service-card')).toHaveCount(4);
-  await page.locator('.service-card[href="#trip"]').click();
   await expect(page.locator('#view-trip')).toBeVisible();
-  await expect(page.locator('.favorites-card')).not.toHaveAttribute('open', '');
-  await expect(page.locator('.commute-card')).not.toHaveAttribute('open', '');
   await page.goBack();
-  await expect(page.locator('#view-services')).toBeVisible();
-  await page.goBack();
-  await expect(page.locator('#view-welcome')).toBeVisible();
+  await expect(page.locator('#view-home')).toBeVisible();
+  await page.locator('.service-card[href="#garage"]').click();
+  await expect(page.locator('#view-garage')).toBeVisible();
+  // Links saved from the previous layout still land somewhere sensible.
+  for (const hash of ['welcome', 'services']) {
+    await page.goto('./#' + hash);
+    await expect(page.locator('#view-home')).toBeVisible();
+  }
 });
 
 test('tank inputs, Arabic digits, price, invalid values and reload retain equivalent calculations', async ({
@@ -84,26 +87,24 @@ test('tank inputs, Arabic digits, price, invalid values and reload retain equiva
   await expect(page.locator('#tank-cost')).toHaveText('—');
 });
 
-test('welcome and services fit narrow Arabic and English screens in both themes', async ({
-  page,
-}) => {
+test('home fits narrow Arabic and English screens in both themes', async ({ page }) => {
   await page.goto('./');
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 844 });
     for (const language of ['ar', 'en']) {
       if ((await page.locator('html').getAttribute('lang')) !== language)
         await page.locator('#language').click();
-      for (const view of ['welcome', 'services']) {
-        await page.goto('./#' + view);
-        await expect(page.locator('#view-' + view)).toBeVisible();
-        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
-          width
-        );
-      }
+      await expect(page.locator('#view-home')).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width
+      );
     }
   }
-  await page.goto('./#welcome');
+  const before = await page.locator('html').getAttribute('data-theme');
   await page.locator('#theme').click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme',
+    before === 'dark' ? 'light' : 'dark'
+  );
   await expect(page.locator('#start-calculation')).toBeVisible();
 });

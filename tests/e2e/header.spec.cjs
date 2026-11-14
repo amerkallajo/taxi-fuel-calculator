@@ -36,7 +36,7 @@ test('mobile header stays visible and interactive after scrolling in both main a
     expect(placement.top).toBeLessThanOrEqual(2);
     expect(placement.bottom).toBeLessThan(placement.screenHeight);
 
-    for (const id of ['theme', 'language', 'mobile-settings']) {
+    for (const id of ['theme', 'language', 'open-settings']) {
       const hittable = await page.locator('#' + id).evaluate((el) => {
         const rect = el.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -66,7 +66,7 @@ test('mobile header stays visible and interactive after scrolling in both main a
     await page.locator('#language').click();
     expect(Math.abs((await page.evaluate(() => scrollY)) - beforeScroll)).toBeLessThan(5);
 
-    await page.locator('#mobile-settings').click();
+    await page.locator('#open-settings').click();
     await expect(page.locator('#settings-dialog')).toBeVisible();
     await page.locator('#settings-dialog [data-close]').click();
     await expect(page.locator('#settings-dialog')).toBeHidden();

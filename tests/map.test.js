@@ -327,9 +327,9 @@ async function main() {
   assert.equal(JSON.parse(saved.get('taxi-fuel-offline-v1')).price, '12000');
   const sw = fs.readFileSync('sw.js', 'utf8');
   const html = fs.readFileSync('index.html', 'utf8');
-  assert.ok(sw.includes('road-cost-offline-v16'));
+  assert.ok(sw.includes('road-cost-offline-v17'));
   assert.ok(sw.includes("'./map.js?v=11'"));
-  assert.ok(html.includes('<script defer src="./app.js?v=16"></script>'));
+  assert.ok(html.includes('<script defer src="./app.js?v=17"></script>'));
   assert.ok(html.includes('<script defer src="./map.js?v=11"></script>'));
   assert.ok(html.includes('icons/road-cost-180.png?v=6'));
   console.log(
