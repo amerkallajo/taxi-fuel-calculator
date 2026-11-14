@@ -9,7 +9,7 @@
   const PRODUCTION_HOST = 'amerkallajo.github.io';
 
   // Exclude local previews and tests, and never contact Cloudflare without a token.
-  if (location.hostname !== PRODUCTION_HOST || !/^[a-z0-9_-]{16,128}$/i.test(SITE_TOKEN)) {
+  if (location.hostname !== PRODUCTION_HOST || !/^[a-f0-9]{32}$/i.test(SITE_TOKEN)) {
     return;
   }
 
