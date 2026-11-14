@@ -1,6 +1,6 @@
 # Road Cost – حاسبة تكاليف الطريق
 
-**كل مشوار، محسوب.** رفيق عربي خاص لحساب تكلفة الطريق: حاسبة وقود، سيارات محفوظة، وعدّ المصاري والمصاريف. بلا حسابات أو تتبّع أو خدمات مدفوعة.
+**كل مشوار، محسوب.** رفيق عربي خاص لحساب تكلفة الطريق: حاسبة وقود، سيارات محفوظة، وعدّ المصاري والمصاريف. بلا حسابات أو خدمات مدفوعة. إحصائيات الزيارات اختيارية، وهي غير مفعّلة قبل ضبط رمز Cloudflare.
 
 **[افتح التطبيق](https://amerkallajo.github.io/taxi-fuel-calculator/)** · [تدقيق المشروع](docs/AUDIT.md) · [تقرير الإصدار](docs/RELEASE.md)
 
@@ -39,7 +39,7 @@
 
 صفحة الترحيب توضّح أن الأداة مجانية للجميع، وأن الحسابات لا تُحفظ على خادم المنصة. الحفظ المحلي في المتصفح والإرسال الاختياري لخدمات الخرائط موضّحان صراحةً؛ عبارة الخصوصية لا تعني تعطيل سجلات الجهاز أو خدمات الخرائط.
 
-لا خادم أو حساب أو تحليلات. `road-cost-v4` يحتوي الإعدادات والسيارات والسجلات المالية. تُنسخ إعدادات `taxi-fuel-offline-v1` بأمان، ويستمر تحديث المفتاح القديم للتوافق. يحتفظ `road-cost-last-route-summary-v1` بالمسافة والمدة السابقة للعرض فقط. الإحداثيات وGPS تبقى بالذاكرة ولا تُحفظ في السجل أو النسخة الاحتياطية؛ أسماء الرحلات التي تكتبها تُحفظ بطلبك.
+لا خادم للتطبيق ولا حساب للمستخدم. أُضيف دعم اختياري لإحصائيات الزيارات عبر Cloudflare Web Analytics، لكنه **غير مفعّل** حتى يُضبط الرمز في `analytics.js`؛ بعد التفعيل تُرسل معلومات زيارات عامة إلى Cloudflare ولا تُرسل بيانات السيارات أو المصاريف أو GPS. التفاصيل في [دليل الإحصائيات](docs/ANALYTICS.md). `road-cost-v4` يحتوي الإعدادات والسيارات والسجلات المالية. تُنسخ إعدادات `taxi-fuel-offline-v1` بأمان، ويستمر تحديث المفتاح القديم للتوافق. يحتفظ `road-cost-last-route-summary-v1` بالمسافة والمدة السابقة للعرض فقط. الإحداثيات وGPS تبقى بالذاكرة ولا تُحفظ في السجل أو النسخة الاحتياطية؛ أسماء الرحلات التي تكتبها تُحفظ بطلبك.
 
 مسودة `sessionStorage` ليست بديلاً عن حفظ الرحلة. عند تعذر التخزين يظهر تحذير ولا يُعلن نجاح حفظ رحلة أو سيارة فشل حفظها. عند اكتشاف بيانات تالفة تُحاول كتابة نسخة خام في `road-cost-recovery-v4` ثم استعادة الإعدادات القديمة المتاحة. صدّر JSON قبل مسح بيانات المتصفح أو تغيير الجهاز. الملفات التي تصدّرها أو تشاركها قد تحتوي أسماء رحلاتك.
 
@@ -85,7 +85,7 @@ $env:PLAYWRIGHT_BROWSER_CHANNEL = 'chrome'
 npm run test:e2e -- --project=chromium-desktop --project=chromium-mobile
 ```
 
-`core.js`: pure calculations/schema. `app.js`: UI/storage/updates. `styles.css`: the single stylesheet (mobile first, desktop from 1024px). `map.js`: geocoding independent from routing. `sw.js`: explicit app shell. Browser tests serve real local Leaflet and mock external APIs/GPS. Chromium separately tests an actual worker, offline reload and HTTP-served update lifecycle. WebKit does not pretend to cover a physical iPhone or the Chromium worker.
+`analytics.js`: opt-in, production-only Cloudflare beacon (disabled without token). `core.js`: pure calculations/schema. `app.js`: UI/storage/updates. `styles.css`: the single stylesheet (mobile first, desktop from 1024px). `map.js`: geocoding independent from routing. `sw.js`: explicit app shell. Browser tests serve real local Leaflet and mock external APIs/GPS. Chromium separately tests an actual worker, offline reload and HTTP-served update lifecycle. WebKit does not pretend to cover a physical iPhone or the Chromium worker.
 
 CI runs deterministic checks and browser journeys, uploads reports, reports upstream availability separately, and compares deployed public bytes to the commit. Deployment is not inferred from a test pass. Local screenshots in ignored `output/playwright/`; browser reports/results also ignored.
 
