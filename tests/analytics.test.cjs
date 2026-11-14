@@ -8,7 +8,7 @@ const script = fs.readFileSync('analytics.js', 'utf8');
 function run(token, hostname = 'amerkallajo.github.io') {
   const injected = [];
   const source = script.replace("const SITE_TOKEN = '';", `const SITE_TOKEN = '${token}';`);
-  assert.notEqual(source, script, 'token setting must remain discoverable');
+  assert.match(script, /const SITE_TOKEN = '';/);
   const document = {
     createElement(tag) {
       return {
