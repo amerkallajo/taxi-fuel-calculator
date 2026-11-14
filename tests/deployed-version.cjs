@@ -15,6 +15,7 @@ const assets = [
   'finance.js',
   'sw.js',
   'manifest.webmanifest',
+  'apple-touch-icon.png',
   'fonts/alexandria.woff2',
   'vendor/leaflet.js',
   'vendor/leaflet.css',
